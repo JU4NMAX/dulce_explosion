@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dulce Explosión - Tu Tienda de Dulces</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- ANIMACIÓN DE DULCES EN LA PARTE SUPERIOR -->
+    <div class="candy-banner">
+        <div class="candy-track">
+            <div class="candy" style="--rotation: 0deg; --delay: 0s;">🍭</div>
+            <div class="candy" style="--rotation: 15deg; --delay: 0.5s;">🍬</div>
+            <div class="candy" style="--rotation: -10deg; --delay: 1s;">🍫</div>
+            <div class="candy" style="--rotation: 20deg; --delay: 1.5s;">🧁</div>
+            <div class="candy" style="--rotation: -15deg; --delay: 2s;">🍯</div>
+            <div class="candy" style="--rotation: 10deg; --delay: 2.5s;">🍪</div>
+            <div class="candy" style="--rotation: -20deg; --delay: 3s;">🎂</div>
+            <div class="candy" style="--rotation: 12deg; --delay: 3.5s;">🍖</div>
+        </div>
+    </div>
+
+    <!-- ENCABEZADO -->
+    <header class="header">
+        <div class="container">
+            <div class="logo-section">
+                <h1 class="logo">🍭 Dulce Explosión 🍭</h1>
+                <p class="tagline">¡Tus dulces favoritos, a un click de distancia!</p>
+            </div>
+            <div class="status-section">
+                <div class="status-indicator" id="statusIndicator">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span class="status-text" id="statusText">Abierto</span>
+                </div>
+                <button class="cart-button" id="cartButton">
+                    🛒 <span class="cart-count" id="cartCount">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+        <!-- SECCIÓN DE FILTROS -->
+        <div class="filters-section">
+            <div class="container">
+                <button class="filter-btn active" data-category="todos">
+                    Todos los Dulces
+                </button>
+                <button class="filter-btn" data-category="chocolates">
+                    🍫 Chocolates y Chocolatinas
+                </button>
+                <button class="filter-btn" data-category="gomitas">
+                    🍬 Gomitas y Caramelos
+                </button>
+                <button class="filter-btn" data-category="snacks">
+                    🥨 Snacks y Pasabocas
+                </button>
+                <button class="filter-btn" data-category="promociones">
+                    ⭐ Promociones del Día
+                </button>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- GALERÍA DE PRODUCTOS -->
+            <section class="products-section" id="productsSection">
+                <div class="products-grid" id="productsGrid">
+                    <!-- Los productos se cargan aquí con JavaScript -->
+                </div>
+            </section>
+
+            <!-- CARRITO -->
+            <aside class="cart-sidebar" id="cartSidebar">
+                <div class="cart-header">
+                    <h2>Tu Carrito</h2>
+                    <button class="close-cart" id="closeCart">✕</button>
+                </div>
+                
+                <div class="cart-items" id="cartItems">
+                    <p class="empty-message">Tu carrito está vacío</p>
+                </div>
+
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span id="subtotal">$0</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Total:</span>
+                        <span id="total" class="total-price">$0</span>
+                    </div>
+                </div>
+
+                <button class="checkout-btn" id="checkoutBtn">
+                    Comprar por WhatsApp 📲
+                </button>
+
+                <button class="clear-cart-btn" id="clearCartBtn">
+                    Vaciar Carrito
+                </button>
+            </aside>
+        </div>
+    </main>
+
+    <!-- MODAL DEL CARRITO (mobile) -->
+    <div class="modal-overlay" id="cartModal"></div>
+
+    <!-- BOTÓN FLOTANTE ADMIN -->
+    <button class="admin-access-btn" id="adminAccessBtn">⚙️</button>
+
+    <!-- PANEL DE ADMINISTRACIÓN -->
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-modal">
+            <div class="admin-header">
+                <h2>Panel de Administración</h2>
+                <button class="admin-close" id="adminCloseBtn">✕</button>
+            </div>
+
+            <!-- TAB: GESTIÓN DE PRODUCTOS -->
+            <div class="admin-tabs">
+                <button class="admin-tab active" data-tab="manage">Gestionar Productos</button>
+                <button class="admin-tab" data-tab="add">Agregar Producto</button>
+                <button class="admin-tab" data-tab="settings">Configuración</button>
+            </div>
+
+            <!-- SECCIÓN: GESTIONAR PRODUCTOS -->
+            <div class="admin-content active" data-content="manage">
+                <div class="products-admin-list" id="productsAdminList">
+                    <!-- Se cargan los productos para editar -->
+                </div>
+            </div>
+
+            <!-- SECCIÓN: AGREGAR PRODUCTO -->
+            <div class="admin-content" data-content="add">
+                <form class="admin-form" id="addProductForm">
+                    <div class="form-group">
+                        <label>Nombre del Producto</label>
+                        <input type="text" id="productName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Categoría</label>
+                        <select id="productCategory" required>
+                            <option value="">Selecciona una categoría</option>
+                            <option value="chocolates">Chocolates y Chocolatinas</option>
+                            <option value="gomitas">Gomitas y Caramelos</option>
+                            <option value="snacks">Snacks y Pasabocas</option>
+                            <option value="promociones">Promociones del Día</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Precio ($)</label>
+                        <input type="number" id="productPrice" min="0" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Cantidad en Stock</label>
+                        <input type="number" id="productStock" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Emoji (ej: 🍫, 🍬, 🧁)</label>
+                        <input type="text" id="productEmoji" maxlength="2" value="🍭">
+                    </div>
+                    <button type="submit" class="admin-submit-btn">Agregar Producto</button>
+                </form>
+            </div>
+
+            <!-- SECCIÓN: CONFIGURACIÓN -->
+            <div class="admin-content" data-content="settings">
+                <div class="settings-group">
+                    <h3>Horario de Atención</h3>
+                    <div class="time-input-group">
+                        <label>Abre a las:</label>
+                        <input type="time" id="openTime" value="08:00">
+                    </div>
+                    <div class="time-input-group">
+                        <label>Cierra a las:</label>
+                        <input type="time" id="closeTime" value="20:00">
+                    </div>
+                    <button class="settings-save-btn" id="saveTimesBtn">Guardar Horario</button>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Cambiar Contraseña Admin</h3>
+                    <div class="form-group">
+                        <label>Contraseña Actual</label>
+                        <input type="password" id="currentPassword">
+                    </div>
+                    <div class="form-group">
+                        <label>Nueva Contraseña</label>
+                        <input type="password" id="newPassword">
+                    </div>
+                    <button class="settings-save-btn" id="changePasswordBtn">Cambiar Contraseña</button>
+                </div>
+
+                <div class="settings-group danger">
+                    <h3>Zona de Peligro</h3>
+                    <button class="danger-btn" id="resetDataBtn">Eliminar Todos los Datos</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE AUTENTICACIÓN ADMIN -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-box">
+            <h2>Acceso Admin</h2>
+            <p>Ingresa la contraseña para acceder</p>
+            <input type="password" id="adminPassword" placeholder="Contraseña">
+            <button id="authSubmitBtn">Ingresar</button>
+            <button id="authCancelBtn" class="secondary-btn">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="app.js"></script>
+</body>
+</html>
