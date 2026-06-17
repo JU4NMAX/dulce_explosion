@@ -64,17 +64,18 @@ function updateStatusIndicator() {
     const dot = document.getElementById("statusDot");
     const text = document.getElementById("statusText");
     
-    if (isOpen) {
-        dot.className = "status-dot open";
-        text.textContent = "Abierto";
-    } else {
-        dot.className = "status-dot closed";
-        text.textContent = "Cerrado";
+    if (dot && text) {
+        if (isOpen) {
+            dot.className = "status-dot open";
+            text.textContent = "Abierto";
+        } else {
+            dot.className = "status-dot closed";
+            text.textContent = "Cerrado";
+        }
     }
 }
 
 function showNotification(message, type = "success") {
-    // Notificación simple en consola y alert
     console.log(`[${type}] ${message}`);
     if (type === "error") alert(message);
 }
@@ -122,8 +123,10 @@ function loadDataFromFirebase() {
         }
     });
 
-    document.getElementById("loadingSpinner").style.display = "none";
-    document.getElementById("loadingSpinnerPromo").style.display = "none";
+    const spinner = document.getElementById("loadingSpinner");
+    const spinnerPromo = document.getElementById("loadingSpinnerPromo");
+    if (spinner) spinner.style.display = "none";
+    if (spinnerPromo) spinnerPromo.style.display = "none";
 }
 
 // ===============================================
@@ -132,6 +135,7 @@ function loadDataFromFirebase() {
 
 function renderCategoryFilters() {
     const container = document.getElementById("categoryFilters");
+    if (!container) return;
     
     let html = `
         <button class="category-filter active" data-category="todos">
@@ -162,6 +166,8 @@ function renderCategoryFilters() {
 function renderProducts() {
     const grid = document.getElementById("productsGrid");
     const promoGrid = document.getElementById("promotionsGrid");
+    
+    if (!grid || !promoGrid) return;
     
     // Filtrar productos normales
     let normalProducts = state.products.filter(p => !p.isPromotion);
@@ -225,6 +231,7 @@ function attachProductListeners() {
     document.querySelectorAll(".quantity-input").forEach(input => {
         input.addEventListener("change", function() {
             const product = state.products.find(p => p.id === this.dataset.productId);
+            if (!product) return;
             if (parseInt(this.value) > product.stock) this.value = product.stock;
             if (parseInt(this.value) < 1) this.value = 1;
         });
@@ -259,7 +266,7 @@ function addToCart(productId, quantity = 1) {
             price: product.price,
             quantity: quantity,
             emoji: product.emoji,
-            isPromotion: product.isPromotion
+            isPromotion: product.isPromotion || false
         });
     }
 
@@ -276,7 +283,7 @@ function updateCartQuantity(productId, quantity) {
     const item = state.cart.find(i => i.id === productId);
     const product = state.products.find(p => p.id === productId);
     
-    if (item) {
+    if (item && product) {
         if (quantity > product.stock) {
             alert("No hay suficiente stock");
             return;
@@ -300,20 +307,20 @@ function updateCartUI() {
     const cartCount = document.getElementById("cartCount");
     const total = calculateTotal();
     
-    cartCount.textContent = state.cart.length;
+    if (cartCount) cartCount.textContent = state.cart.length;
 
     if (state.cart.length === 0) {
         const emptyHtml = '<p class="empty-message">Tu carrito está vacío</p>';
-        cartItems.innerHTML = emptyHtml;
-        modalItems.innerHTML = emptyHtml;
-        document.getElementById("total").textContent = "$0";
-        document.getElementById("modalTotal").textContent = "$0";
+        if (cartItems) cartItems.innerHTML = emptyHtml;
+        if (modalItems) modalItems.innerHTML = emptyHtml;
+        if (document.getElementById("total")) document.getElementById("total").textContent = "$0";
+        if (document.getElementById("modalTotal")) document.getElementById("modalTotal").textContent = "$0";
         return;
     }
 
     const cartHtml = state.cart.map(item => `
         <div class="cart-item">
-            <div class="cart-item-name">${item.emoji} ${item.name}</div>
+            <div class="cart-item-name">${item.emoji || "🍭"} ${item.name}</div>
             <div class="cart-item-price">${formatPrice(item.price)} c/u</div>
             <div class="cart-item-controls">
                 <input type="number" class="cart-item-qty" value="${item.quantity}" min="1" data-product-id="${item.id}">
@@ -323,10 +330,10 @@ function updateCartUI() {
         </div>
     `).join("");
 
-    cartItems.innerHTML = cartHtml;
-    modalItems.innerHTML = cartHtml;
-    document.getElementById("total").textContent = formatPrice(total);
-    document.getElementById("modalTotal").textContent = formatPrice(total);
+    if (cartItems) cartItems.innerHTML = cartHtml;
+    if (modalItems) modalItems.innerHTML = cartHtml;
+    if (document.getElementById("total")) document.getElementById("total").textContent = formatPrice(total);
+    if (document.getElementById("modalTotal")) document.getElementById("modalTotal").textContent = formatPrice(total);
 
     // Event listeners
     document.querySelectorAll(".cart-item-qty").forEach(input => {
@@ -364,17 +371,18 @@ function checkout() {
     }
 
     const total = calculateTotal();
-    let message = "Hola! Me gustaría comprar los siguientes productos:\n\n";
+    let message = "¡Hola! Me gustaría comprar los siguientes productos:\n\n";
     
-    state.cart.forEach(item => {
-        message += `${index + 1}. ${item.name}\n`;
+    // Añadimos 'index' como segundo parámetro para poder enumerar los productos correctamente
+    state.cart.forEach((item, index) => {
+        message += `${index + 1}. ${item.emoji || "🍭"} ${item.name}\n`;
         message += `   Cantidad: ${item.quantity}\n`;
         message += `   Precio unitario: ${formatPrice(item.price)}\n`;
         message += `   Subtotal: ${formatPrice(item.price * item.quantity)}\n\n`;
     });
 
-    message += `---TOTAL A PAGAR: ${formatPrice(total)}\n\n`;
-    message += "Gracias por comprar en Dulce Explosion!";
+    message += `--- TOTAL A PAGAR: ${formatPrice(total)} ---\n\n`;
+    message += "¡Gracias por comprar en Dulce Explosión! 🍭";
 
     const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
     window.open(whatsappURL, "_blank");
@@ -394,9 +402,9 @@ function toggleCartSidebar() {
     const sidebar = document.getElementById("cartSidebar");
     const modal = document.getElementById("cartModal");
     
-    sidebar.classList.toggle("active");
-    modal.classList.toggle("active");
-    document.getElementById("overlay").classList.toggle("active");
+    if (sidebar) sidebar.classList.toggle("active");
+    if (modal) modal.classList.toggle("active");
+    if (document.getElementById("overlay")) document.getElementById("overlay").classList.toggle("active");
 }
 
 // ===============================================
@@ -440,6 +448,7 @@ function renderAdminPanel() {
 
 function renderAdminProducts() {
     const list = document.getElementById("productsAdminList");
+    if (!list) return;
     
     if (state.products.length === 0) {
         list.innerHTML = '<p class="loading-text">Sin productos</p>';
@@ -475,7 +484,7 @@ function renderAdminProducts() {
         });
     });
 
-    document.querySelectorAll(".delete-btn").forEach(btn => {
+    document.querySelectorAll(".product-admin-item .delete-btn").forEach(btn => {
         btn.addEventListener("click", () => {
             if (confirm("¿Eliminar este producto?")) {
                 deleteProduct(btn.dataset.productId);
@@ -506,7 +515,7 @@ function addProduct() {
     const emoji = document.getElementById("productEmoji").value.trim() || "🍭";
     const isPromotion = document.getElementById("isPromotion").checked;
 
-    if (!name || !category || !price || stock < 0) {
+    if (!name || !category || isNaN(price) || isNaN(stock) || stock < 0) {
         alert("Completa todos los campos correctamente");
         return;
     }
@@ -528,6 +537,7 @@ function addProduct() {
 
 function renderAdminCategories() {
     const list = document.getElementById("categoriesList");
+    if (!list) return;
     
     list.innerHTML = state.categories.map((cat, idx) => `
         <div class="category-admin-item">
@@ -544,6 +554,7 @@ function renderAdminCategories() {
     });
 }
 
+//
 function addCategory() {
     const form = document.getElementById("categoryForm");
     const name = document.getElementById("categoryName").value.trim();
@@ -573,6 +584,7 @@ function deleteCategory(idx) {
 
 function updateAdminCategorySelect() {
     const select = document.getElementById("productCategory");
+    if (!select) return;
     select.innerHTML = '<option value="">Selecciona categoría</option>';
     state.categories.forEach(cat => {
         select.innerHTML += `<option value="${cat}">${cat}</option>`;
@@ -656,25 +668,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Carrito
-    document.getElementById("cartButton").addEventListener("click", toggleCartSidebar);
-    document.getElementById("closeCart").addEventListener("click", toggleCartSidebar);
-    document.getElementById("modalClose").addEventListener("click", toggleCartSidebar);
-    document.getElementById("overlay").addEventListener("click", toggleCartSidebar);
+    if (document.getElementById("cartButton")) document.getElementById("cartButton").addEventListener("click", toggleCartSidebar);
+    if (document.getElementById("closeCart")) document.getElementById("closeCart").addEventListener("click", toggleCartSidebar);
+    if (document.getElementById("modalClose")) document.getElementById("modalClose").addEventListener("click", toggleCartSidebar);
+    if (document.getElementById("overlay")) document.getElementById("overlay").addEventListener("click", toggleCartSidebar);
 
-    document.getElementById("checkoutBtn").addEventListener("click", checkout);
-    document.getElementById("checkoutBtnModal").addEventListener("click", checkout);
-    document.getElementById("clearCartBtn").addEventListener("click", clearCart);
-    document.getElementById("clearCartBtnModal").addEventListener("click", clearCart);
+    if (document.getElementById("checkoutBtn")) document.getElementById("checkoutBtn").addEventListener("click", checkout);
+    if (document.getElementById("checkoutBtnModal")) document.getElementById("checkoutBtnModal").addEventListener("click", checkout);
+    if (document.getElementById("clearCartBtn")) document.getElementById("clearCartBtn").addEventListener("click", clearCart);
+    if (document.getElementById("clearCartBtnModal")) document.getElementById("clearCartBtnModal").addEventListener("click", clearCart);
 
     // Admin
-    document.getElementById("adminFloatBtn").addEventListener("click", showAdminPanel);
-    document.getElementById("adminCloseBtn").addEventListener("click", hideAdminPanel);
-    document.getElementById("authSubmitBtn").addEventListener("click", verifyAdminPassword);
-    document.getElementById("authCancelBtn").addEventListener("click", hideAdminPanel);
+    if (document.getElementById("adminFloatBtn")) document.getElementById("adminFloatBtn").addEventListener("click", showAdminPanel);
+    if (document.getElementById("adminCloseBtn")) document.getElementById("adminCloseBtn").addEventListener("click", hideAdminPanel);
+    if (document.getElementById("authSubmitBtn")) document.getElementById("authSubmitBtn").addEventListener("click", verifyAdminPassword);
+    if (document.getElementById("authCancelBtn")) document.getElementById("authCancelBtn").addEventListener("click", hideAdminPanel);
 
-    document.getElementById("adminPassword").addEventListener("keypress", (e) => {
-        if (e.key === "Enter") verifyAdminPassword();
-    });
+    const adminPassInput = document.getElementById("adminPassword");
+    if (adminPassInput) {
+        adminPassInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") verifyAdminPassword();
+        });
+    }
 
     // Admin tabs
     document.querySelectorAll(".admin-tab").forEach(tab => {
@@ -688,28 +703,36 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Admin forms
-    document.getElementById("addProductForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-        addProduct();
-    });
+    if (document.getElementById("addProductForm")) {
+        document.getElementById("addProductForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            addProduct();
+        });
+    }
 
-    document.getElementById("categoryForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-        addCategory();
-    });
+    if (document.getElementById("categoryForm")) {
+        document.getElementById("categoryForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            addCategory();
+        });
+    }
 
-    document.getElementById("saveTimesBtn").addEventListener("click", saveTimes);
-    document.getElementById("changePasswordBtn").addEventListener("click", changePassword);
-    document.getElementById("resetDataBtn").addEventListener("click", resetAllData);
+    if (document.getElementById("saveTimesBtn")) document.getElementById("saveTimesBtn").addEventListener("click", saveTimes);
+    if (document.getElementById("changePasswordBtn")) document.getElementById("changePasswordBtn").addEventListener("click", changePassword);
+    if (document.getElementById("resetDataBtn")) document.getElementById("resetDataBtn").addEventListener("click", resetAllData);
 
     // Cerrar admin modal al hacer click fuera
-    document.getElementById("adminPanel").addEventListener("click", (e) => {
-        if (e.target.id === "adminPanel") hideAdminPanel();
-    });
+    if (document.getElementById("adminPanel")) {
+        document.getElementById("adminPanel").addEventListener("click", (e) => {
+            if (e.target.id === "adminPanel") hideAdminPanel();
+        });
+    }
 
-    document.getElementById("authModal").addEventListener("click", (e) => {
-        if (e.target.id === "authModal") hideAdminPanel();
-    });
+    if (document.getElementById("authModal")) {
+        document.getElementById("authModal").addEventListener("click", (e) => {
+            if (e.target.id === "authModal") hideAdminPanel();
+        });
+    }
 });
 
 // Actualizar estado cada minuto
