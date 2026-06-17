@@ -5,17 +5,17 @@
 }
 
 :root {
-    --primary-blue: #0066ff;
-    --primary-green: #00cc66;
-    --secondary-blue: #0052cc;
-    --secondary-green: #00aa55;
-    --light-blue: #e6f2ff;
-    --light-green: #e6ffe6;
+    --primary-yellow: #FFD700;
+    --primary-red: #FF4444;
+    --secondary-yellow: #FFC500;
+    --secondary-red: #DD3333;
+    --light-yellow: #FFFACD;
+    --light-red: #FFE6E6;
     --dark-text: #1a1a2e;
     --light-text: #ffffff;
     --border-color: #e0e0e0;
     --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.08);
-    --shadow-medium: 0 4px 16px rgba(0, 102, 255, 0.15);
+    --shadow-medium: 0 4px 16px rgba(255, 68, 68, 0.2);
     --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
 
@@ -32,7 +32,7 @@ html, body {
    ================================================ */
 
 .candy-banner {
-    background: linear-gradient(90deg, #0066ff 0%, #00cc66 50%, #0066ff 100%);
+    background: linear-gradient(90deg, #FF4444 0%, #FFD700 50%, #FF4444 100%);
     padding: 16px 0;
     overflow: hidden;
     box-shadow: var(--shadow-dark);
@@ -79,7 +79,7 @@ html, body {
     background: var(--light-text);
     padding: 16px 0;
     border-bottom: 3px solid transparent;
-    border-image: linear-gradient(90deg, var(--primary-blue), var(--primary-green)) 1;
+    border-image: linear-gradient(90deg, var(--primary-red), var(--primary-yellow)) 1;
     box-shadow: var(--shadow-light);
     position: sticky;
     top: 0;
@@ -99,21 +99,33 @@ html, body {
 
 .logo-title {
     font-size: 1.6rem;
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-green));
+    background: linear-gradient(135deg, var(--primary-red), var(--primary-yellow));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     margin-bottom: 4px;
     font-weight: 700;
-    animation: pulse-title 2s ease-in-out infinite;
+    animation: pulse-title-animated 3s ease-in-out infinite;
 }
 
-@keyframes pulse-title {
-    0%, 100% {
+@keyframes pulse-title-animated {
+    0% {
         transform: scale(1);
+        background: linear-gradient(135deg, var(--primary-red), var(--primary-yellow));
+        -webkit-background-clip: text;
+        background-clip: text;
     }
     50% {
-        transform: scale(1.02);
+        transform: scale(1.03);
+        background: linear-gradient(135deg, var(--primary-yellow), var(--primary-red));
+        -webkit-background-clip: text;
+        background-clip: text;
+    }
+    100% {
+        transform: scale(1);
+        background: linear-gradient(135deg, var(--primary-red), var(--primary-yellow));
+        -webkit-background-clip: text;
+        background-clip: text;
     }
 }
 
@@ -148,8 +160,8 @@ html, body {
 }
 
 .status-dot.open {
-    background: var(--primary-green);
-    box-shadow: 0 0 8px rgba(0, 204, 102, 0.5);
+    background: #FFD700;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
 }
 
 .status-dot.closed {
@@ -168,7 +180,8 @@ html, body {
 
 .cart-button {
     position: relative;
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-green));
+    background: linear-gradient(90deg, var(--primary-red), var(--primary-yellow), var(--primary-red));
+    background-size: 200% 200%;
     color: white;
     border: none;
     padding: 10px 16px;
@@ -179,6 +192,19 @@ html, body {
     transition: all 0.3s ease;
     box-shadow: var(--shadow-medium);
     white-space: nowrap;
+    animation: gradient-shift 3s ease infinite;
+}
+
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .cart-button:hover {
@@ -192,7 +218,7 @@ html, body {
 
 .cart-count {
     background: #ffff00;
-    color: var(--primary-blue);
+    color: var(--primary-red);
     border-radius: 50%;
     padding: 2px 6px;
     margin-left: 6px;
@@ -237,15 +263,17 @@ html, body {
 }
 
 .tab-button:hover {
-    border-color: var(--primary-blue);
-    color: var(--primary-blue);
+    border-color: var(--primary-red);
+    color: var(--primary-red);
 }
 
 .tab-button.active {
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-green));
+    background: linear-gradient(90deg, var(--primary-red), var(--primary-yellow), var(--primary-red));
+    background-size: 200% 200%;
     color: white;
     border-color: transparent;
     box-shadow: var(--shadow-medium);
+    animation: gradient-shift 3s ease infinite;
 }
 
 /* ================================================
@@ -294,14 +322,16 @@ html, body {
 }
 
 .category-filter:hover {
-    border-color: var(--primary-blue);
-    color: var(--primary-blue);
+    border-color: var(--primary-red);
+    color: var(--primary-red);
 }
 
 .category-filter.active {
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-green));
+    background: linear-gradient(90deg, var(--primary-red), var(--primary-yellow), var(--primary-red));
+    background-size: 200% 200%;
     color: white;
     border-color: transparent;
+    animation: gradient-shift 3s ease infinite;
 }
 
 /* ================================================
@@ -343,14 +373,14 @@ html, body {
 .product-card:hover {
     transform: translateY(-6px);
     box-shadow: var(--shadow-dark);
-    border-color: var(--primary-blue);
+    border-color: var(--primary-red);
 }
 
 .product-emoji {
     font-size: 3.5rem;
     text-align: center;
     padding: 16px 8px;
-    background: linear-gradient(135deg, var(--light-blue), var(--light-green));
+    background: linear-gradient(135deg, var(--light-red), var(--light-yellow));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -392,7 +422,7 @@ html, body {
 .product-price {
     font-size: 1.3rem;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-green));
+    background: linear-gradient(135deg, var(--primary-red), var(--primary-yellow));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -418,13 +448,14 @@ html, body {
 
 .quantity-input:focus {
     outline: none;
-    border-color: var(--primary-blue);
+    border-color: var(--primary-red);
 }
 
 .add-to-cart-btn {
     flex: 1;
     padding: 8px;
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-green));
+    background: linear-gradient(90deg, var(--primary-red), var(--primary-yellow), var(--primary-red));
+    background-size: 200% 200%;
     color: white;
     border: none;
     border-radius: 6px;
@@ -432,6 +463,7 @@ html, body {
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 0.8rem;
+    animation: gradient-shift 3s ease infinite;
 }
 
 .add-to-cart-btn:hover {
@@ -471,7 +503,7 @@ html, body {
     border-radius: 12px;
     box-shadow: var(--shadow-dark);
     flex-direction: column;
-    border: 1px solid var(--light-blue);
+    border: 1px solid var(--light-red);
 }
 
 @media (min-width: 1024px) {
@@ -489,12 +521,12 @@ html, body {
 
 .cart-header {
     padding: 16px;
-    border-bottom: 2px solid var(--light-blue);
-    background: linear-gradient(135deg, var(--light-blue), var(--light-green));
+    border-bottom: 2px solid var(--light-red);
+    background: linear-gradient(135deg, var(--light-red), var(--light-yellow));
 }
 
 .cart-header h2 {
-    color: var(--primary-blue);
+    color: var(--primary-red);
     font-size: 1.1rem;
     margin: 0;
 }
@@ -519,7 +551,7 @@ html, body {
     padding: 10px;
     border-radius: 8px;
     margin-bottom: 10px;
-    border-left: 3px solid var(--primary-green);
+    border-left: 3px solid var(--primary-yellow);
     font-size: 0.85rem;
     animation: slide-in 0.3s ease;
 }
@@ -531,7 +563,7 @@ html, body {
 }
 
 .cart-item-price {
-    color: var(--primary-blue);
+    color: var(--primary-red);
     font-weight: 700;
     margin-bottom: 4px;
 }
@@ -571,8 +603,8 @@ html, body {
 
 .cart-summary {
     padding: 12px 16px;
-    border-top: 2px solid var(--light-blue);
-    border-bottom: 2px solid var(--light-blue);
+    border-top: 2px solid var(--light-red);
+    border-bottom: 2px solid var(--light-red);
 }
 
 .summary-row {
@@ -584,7 +616,7 @@ html, body {
 }
 
 .total-price {
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-green));
+    background: linear-gradient(135deg, var(--primary-red), var(--primary-yellow));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -604,9 +636,11 @@ html, body {
 }
 
 .checkout-btn {
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-green));
+    background: linear-gradient(90deg, var(--primary-red), var(--primary-yellow), var(--primary-red));
+    background-size: 200% 200%;
     color: white;
     box-shadow: var(--shadow-medium);
+    animation: gradient-shift 3s ease infinite;
 }
 
 .checkout-btn:hover {
@@ -679,15 +713,15 @@ html, body {
 
 .modal-header {
     padding: 16px;
-    border-bottom: 2px solid var(--light-blue);
-    background: linear-gradient(135deg, var(--light-blue), var(--light-green));
+    border-bottom: 2px solid var(--light-red);
+    background: linear-gradient(135deg, var(--light-red), var(--light-yellow));
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .modal-header h2 {
-    color: var(--primary-blue);
+    color: var(--primary-red);
     font-size: 1.1rem;
     margin: 0;
 }
@@ -708,7 +742,7 @@ html, body {
 
 .modal-summary {
     padding: 12px 16px;
-    border-top: 2px solid var(--light-blue);
+    border-top: 2px solid var(--light-red);
 }
 
 /* ================================================
@@ -798,7 +832,7 @@ html, body {
 }
 
 .auth-box h2 {
-    color: var(--primary-blue);
+    color: var(--primary-red);
     margin-bottom: 8px;
     font-size: 1.3rem;
 }
@@ -821,7 +855,7 @@ html, body {
 
 .auth-box input:focus {
     outline: none;
-    border-color: var(--primary-blue);
+    border-color: var(--primary-red);
 }
 
 .auth-btn {
@@ -833,7 +867,7 @@ html, body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-green));
+    background: linear-gradient(135deg, var(--primary-red), var(--primary-yellow));
     color: white;
 }
 
@@ -867,14 +901,14 @@ html, body {
     justify-content: space-between;
     align-items: center;
     padding: 16px;
-    border-bottom: 2px solid var(--light-blue);
-    background: linear-gradient(135deg, var(--light-blue), var(--light-green));
+    border-bottom: 2px solid var(--light-red);
+    background: linear-gradient(135deg, var(--light-red), var(--light-yellow));
     position: sticky;
     top: 0;
 }
 
 .admin-header h2 {
-    color: var(--primary-blue);
+    color: var(--primary-red);
     margin: 0;
 }
 
@@ -911,8 +945,8 @@ html, body {
 }
 
 .admin-tab.active {
-    color: var(--primary-blue);
-    border-bottom-color: var(--primary-blue);
+    color: var(--primary-red);
+    border-bottom-color: var(--primary-red);
 }
 
 .admin-content {
@@ -953,7 +987,7 @@ html, body {
 
 .form-group input:focus, .form-group select:focus {
     outline: none;
-    border-color: var(--primary-blue);
+    border-color: var(--primary-red);
 }
 
 .form-group input[type="checkbox"] {
@@ -962,9 +996,11 @@ html, body {
 }
 
 .admin-btn-primary {
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-green));
+    background: linear-gradient(90deg, var(--primary-red), var(--primary-yellow), var(--primary-red));
+    background-size: 200% 200%;
     color: white;
     box-shadow: var(--shadow-medium);
+    animation: gradient-shift 3s ease infinite;
 }
 
 .admin-btn-primary:hover {
@@ -1010,7 +1046,7 @@ html, body {
     background: #f9f9f9;
     padding: 12px;
     border-radius: 8px;
-    border-left: 3px solid var(--primary-green);
+    border-left: 3px solid var(--primary-yellow);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1027,7 +1063,7 @@ html, body {
 }
 
 .product-admin-price {
-    color: var(--primary-blue);
+    color: var(--primary-red);
     font-weight: 700;
     font-size: 0.9rem;
 }
@@ -1055,9 +1091,9 @@ html, body {
 }
 
 .stock-btn:hover {
-    border-color: var(--primary-blue);
-    color: var(--primary-blue);
-    background: var(--light-blue);
+    border-color: var(--primary-red);
+    color: var(--primary-red);
+    background: var(--light-red);
 }
 
 .stock-display {
@@ -1099,7 +1135,7 @@ html, body {
 }
 
 .config-section h3 {
-    color: var(--primary-blue);
+    color: var(--primary-red);
     margin-bottom: 12px;
     font-size: 1rem;
 }
@@ -1121,8 +1157,8 @@ html, body {
 }
 
 .spinner {
-    border: 3px solid var(--light-blue);
-    border-top: 3px solid var(--primary-blue);
+    border: 3px solid var(--light-red);
+    border-top: 3px solid var(--primary-red);
     border-radius: 50%;
     width: 40px;
     height: 40px;
@@ -1196,7 +1232,7 @@ html, body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, var(--primary-blue), var(--primary-green));
+    background: linear-gradient(180deg, var(--primary-red), var(--primary-yellow));
     border-radius: 4px;
 }
 
