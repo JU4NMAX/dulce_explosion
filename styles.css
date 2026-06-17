@@ -5,23 +5,22 @@
 }
 
 :root {
-    --primary-yellow: #FFD700;
-    --primary-red: #FF4444;
-    --secondary-yellow: #FFC500;
-    --secondary-red: #DD3333;
-    --light-yellow: #FFFACD;
-    --light-red: #FFE6E6;
+    --primary-pink: #F3A0C3;
+    --primary-mint: #A2E3D4;
+    --primary-lavender: #C5A3E6;
+    --background-cream: #FAFAFA;
+    --text-caramel: #D2B48C;
     --dark-text: #1a1a2e;
     --light-text: #ffffff;
     --border-color: #e0e0e0;
     --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.08);
-    --shadow-medium: 0 4px 16px rgba(255, 68, 68, 0.2);
+    --shadow-medium: 0 4px 16px rgba(243, 160, 195, 0.2);
     --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
 
 html, body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #f5f9ff 0%, #f0fff5 100%);
+    background: #FAFAFA;
     color: var(--dark-text);
     line-height: 1.6;
     min-height: 100vh;
@@ -32,8 +31,8 @@ html, body {
    ================================================ */
 
 .candy-banner {
-    background: linear-gradient(90deg, #FF4444 0%, #FFD700 50%, #FF4444 100%);
-    padding: 16px 0;
+    background: linear-gradient(90deg, #F3A0C3 0%, #A2E3D4 50%, #F3A0C3 100%);
+    padding: 20px 0;
     overflow: hidden;
     box-shadow: var(--shadow-dark);
     position: relative;
@@ -41,16 +40,17 @@ html, body {
 
 .candy-track {
     display: flex;
-    gap: 40px;
-    animation: scroll 30s linear infinite;
+    gap: 20px;
+    animation: scroll 12s linear infinite;
     will-change: transform;
 }
 
 .candy-item {
-    font-size: 2.2rem;
+    font-size: 3rem;
     flex-shrink: 0;
-    animation: bounce 2s ease-in-out infinite;
+    animation: bounce-dynamic 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    display: inline-block;
 }
 
 @keyframes scroll {
@@ -62,12 +62,18 @@ html, body {
     }
 }
 
-@keyframes bounce {
+@keyframes bounce-dynamic {
     0%, 100% {
-        transform: translateY(0);
+        transform: translateY(0) rotate(0deg) scale(1);
+    }
+    25% {
+        transform: translateY(-25px) rotate(10deg) scale(1.1);
     }
     50% {
-        transform: translateY(-12px);
+        transform: translateY(-35px) rotate(-10deg) scale(1.15);
+    }
+    75% {
+        transform: translateY(-15px) rotate(5deg) scale(1.05);
     }
 }
 
@@ -79,7 +85,7 @@ html, body {
     background: var(--light-text);
     padding: 16px 0;
     border-bottom: 3px solid transparent;
-    border-image: linear-gradient(90deg, var(--primary-red), var(--primary-yellow)) 1;
+    border-image: linear-gradient(90deg, var(--primary-pink), var(--primary-mint)) 1;
     box-shadow: var(--shadow-light);
     position: sticky;
     top: 0;
@@ -99,7 +105,7 @@ html, body {
 
 .logo-title {
     font-size: 1.6rem;
-    background: linear-gradient(135deg, var(--primary-red), var(--primary-yellow));
+    background: linear-gradient(135deg, var(--primary-pink), var(--primary-mint));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -111,19 +117,19 @@ html, body {
 @keyframes pulse-title-animated {
     0% {
         transform: scale(1);
-        background: linear-gradient(135deg, var(--primary-red), var(--primary-yellow));
+        background: linear-gradient(135deg, var(--primary-pink), var(--primary-mint));
         -webkit-background-clip: text;
         background-clip: text;
     }
     50% {
         transform: scale(1.03);
-        background: linear-gradient(135deg, var(--primary-yellow), var(--primary-red));
+        background: linear-gradient(135deg, var(--primary-mint), var(--primary-pink));
         -webkit-background-clip: text;
         background-clip: text;
     }
     100% {
         transform: scale(1);
-        background: linear-gradient(135deg, var(--primary-red), var(--primary-yellow));
+        background: linear-gradient(135deg, var(--primary-pink), var(--primary-mint));
         -webkit-background-clip: text;
         background-clip: text;
     }
@@ -180,7 +186,7 @@ html, body {
 
 .cart-button {
     position: relative;
-    background: linear-gradient(90deg, var(--primary-red), var(--primary-yellow), var(--primary-red));
+    background: linear-gradient(90deg, var(--primary-pink), var(--primary-mint), var(--primary-pink));
     background-size: 200% 200%;
     color: white;
     border: none;
@@ -218,7 +224,7 @@ html, body {
 
 .cart-count {
     background: #ffff00;
-    color: var(--primary-red);
+    color: var(--primary-pink);
     border-radius: 50%;
     padding: 2px 6px;
     margin-left: 6px;
@@ -263,12 +269,12 @@ html, body {
 }
 
 .tab-button:hover {
-    border-color: var(--primary-red);
-    color: var(--primary-red);
+    border-color: var(--primary-pink);
+    color: var(--primary-pink);
 }
 
 .tab-button.active {
-    background: linear-gradient(90deg, var(--primary-red), var(--primary-yellow), var(--primary-red));
+    background: linear-gradient(90deg, var(--primary-pink), var(--primary-mint), var(--primary-pink));
     background-size: 200% 200%;
     color: white;
     border-color: transparent;
@@ -322,12 +328,12 @@ html, body {
 }
 
 .category-filter:hover {
-    border-color: var(--primary-red);
-    color: var(--primary-red);
+    border-color: var(--primary-pink);
+    color: var(--primary-pink);
 }
 
 .category-filter.active {
-    background: linear-gradient(90deg, var(--primary-red), var(--primary-yellow), var(--primary-red));
+    background: linear-gradient(90deg, var(--primary-pink), var(--primary-mint), var(--primary-pink));
     background-size: 200% 200%;
     color: white;
     border-color: transparent;
@@ -373,14 +379,14 @@ html, body {
 .product-card:hover {
     transform: translateY(-6px);
     box-shadow: var(--shadow-dark);
-    border-color: var(--primary-red);
+    border-color: var(--primary-pink);
 }
 
 .product-emoji {
     font-size: 3.5rem;
     text-align: center;
     padding: 16px 8px;
-    background: linear-gradient(135deg, var(--light-red), var(--light-yellow));
+    background: linear-gradient(135deg, #F8E8F0, #E8F6F3);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -422,7 +428,7 @@ html, body {
 .product-price {
     font-size: 1.3rem;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--primary-red), var(--primary-yellow));
+    background: linear-gradient(135deg, var(--primary-pink), var(--primary-mint));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -448,13 +454,13 @@ html, body {
 
 .quantity-input:focus {
     outline: none;
-    border-color: var(--primary-red);
+    border-color: var(--primary-pink);
 }
 
 .add-to-cart-btn {
     flex: 1;
     padding: 8px;
-    background: linear-gradient(90deg, var(--primary-red), var(--primary-yellow), var(--primary-red));
+    background: linear-gradient(90deg, var(--primary-pink), var(--primary-mint), var(--primary-pink));
     background-size: 200% 200%;
     color: white;
     border: none;
@@ -503,7 +509,7 @@ html, body {
     border-radius: 12px;
     box-shadow: var(--shadow-dark);
     flex-direction: column;
-    border: 1px solid var(--light-red);
+    border: 1px solid #F8E8F0;
 }
 
 @media (min-width: 1024px) {
@@ -521,12 +527,12 @@ html, body {
 
 .cart-header {
     padding: 16px;
-    border-bottom: 2px solid var(--light-red);
-    background: linear-gradient(135deg, var(--light-red), var(--light-yellow));
+    border-bottom: 2px solid #F8E8F0;
+    background: linear-gradient(135deg, #F8E8F0, #E8F6F3);
 }
 
 .cart-header h2 {
-    color: var(--primary-red);
+    color: var(--primary-pink);
     font-size: 1.1rem;
     margin: 0;
 }
@@ -551,7 +557,7 @@ html, body {
     padding: 10px;
     border-radius: 8px;
     margin-bottom: 10px;
-    border-left: 3px solid var(--primary-yellow);
+    border-left: 3px solid var(--primary-mint);
     font-size: 0.85rem;
     animation: slide-in 0.3s ease;
 }
@@ -563,7 +569,7 @@ html, body {
 }
 
 .cart-item-price {
-    color: var(--primary-red);
+    color: var(--primary-pink);
     font-weight: 700;
     margin-bottom: 4px;
 }
@@ -603,8 +609,8 @@ html, body {
 
 .cart-summary {
     padding: 12px 16px;
-    border-top: 2px solid var(--light-red);
-    border-bottom: 2px solid var(--light-red);
+    border-top: 2px solid #F8E8F0;
+    border-bottom: 2px solid #F8E8F0;
 }
 
 .summary-row {
@@ -616,7 +622,7 @@ html, body {
 }
 
 .total-price {
-    background: linear-gradient(135deg, var(--primary-red), var(--primary-yellow));
+    background: linear-gradient(135deg, var(--primary-pink), var(--primary-mint));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -636,7 +642,7 @@ html, body {
 }
 
 .checkout-btn {
-    background: linear-gradient(90deg, var(--primary-red), var(--primary-yellow), var(--primary-red));
+    background: linear-gradient(90deg, var(--primary-pink), var(--primary-mint), var(--primary-pink));
     background-size: 200% 200%;
     color: white;
     box-shadow: var(--shadow-medium);
@@ -713,15 +719,15 @@ html, body {
 
 .modal-header {
     padding: 16px;
-    border-bottom: 2px solid var(--light-red);
-    background: linear-gradient(135deg, var(--light-red), var(--light-yellow));
+    border-bottom: 2px solid #F8E8F0;
+    background: linear-gradient(135deg, #F8E8F0, #E8F6F3);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .modal-header h2 {
-    color: var(--primary-red);
+    color: var(--primary-pink);
     font-size: 1.1rem;
     margin: 0;
 }
@@ -742,7 +748,7 @@ html, body {
 
 .modal-summary {
     padding: 12px 16px;
-    border-top: 2px solid var(--light-red);
+    border-top: 2px solid #F8E8F0;
 }
 
 /* ================================================
@@ -832,7 +838,7 @@ html, body {
 }
 
 .auth-box h2 {
-    color: var(--primary-red);
+    color: var(--primary-pink);
     margin-bottom: 8px;
     font-size: 1.3rem;
 }
@@ -855,7 +861,7 @@ html, body {
 
 .auth-box input:focus {
     outline: none;
-    border-color: var(--primary-red);
+    border-color: var(--primary-pink);
 }
 
 .auth-btn {
@@ -867,7 +873,7 @@ html, body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    background: linear-gradient(135deg, var(--primary-red), var(--primary-yellow));
+    background: linear-gradient(135deg, var(--primary-pink), var(--primary-mint));
     color: white;
 }
 
@@ -901,14 +907,14 @@ html, body {
     justify-content: space-between;
     align-items: center;
     padding: 16px;
-    border-bottom: 2px solid var(--light-red);
-    background: linear-gradient(135deg, var(--light-red), var(--light-yellow));
+    border-bottom: 2px solid #F8E8F0;
+    background: linear-gradient(135deg, #F8E8F0, #E8F6F3);
     position: sticky;
     top: 0;
 }
 
 .admin-header h2 {
-    color: var(--primary-red);
+    color: var(--primary-pink);
     margin: 0;
 }
 
@@ -945,8 +951,8 @@ html, body {
 }
 
 .admin-tab.active {
-    color: var(--primary-red);
-    border-bottom-color: var(--primary-red);
+    color: var(--primary-pink);
+    border-bottom-color: var(--primary-pink);
 }
 
 .admin-content {
@@ -987,7 +993,7 @@ html, body {
 
 .form-group input:focus, .form-group select:focus {
     outline: none;
-    border-color: var(--primary-red);
+    border-color: var(--primary-pink);
 }
 
 .form-group input[type="checkbox"] {
@@ -996,7 +1002,7 @@ html, body {
 }
 
 .admin-btn-primary {
-    background: linear-gradient(90deg, var(--primary-red), var(--primary-yellow), var(--primary-red));
+    background: linear-gradient(90deg, var(--primary-pink), var(--primary-mint), var(--primary-pink));
     background-size: 200% 200%;
     color: white;
     box-shadow: var(--shadow-medium);
@@ -1046,7 +1052,7 @@ html, body {
     background: #f9f9f9;
     padding: 12px;
     border-radius: 8px;
-    border-left: 3px solid var(--primary-yellow);
+    border-left: 3px solid var(--primary-mint);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1063,7 +1069,7 @@ html, body {
 }
 
 .product-admin-price {
-    color: var(--primary-red);
+    color: var(--primary-pink);
     font-weight: 700;
     font-size: 0.9rem;
 }
@@ -1091,9 +1097,9 @@ html, body {
 }
 
 .stock-btn:hover {
-    border-color: var(--primary-red);
-    color: var(--primary-red);
-    background: var(--light-red);
+    border-color: var(--primary-pink);
+    color: var(--primary-pink);
+    background: #F8E8F0;
 }
 
 .stock-display {
@@ -1135,7 +1141,7 @@ html, body {
 }
 
 .config-section h3 {
-    color: var(--primary-red);
+    color: var(--primary-pink);
     margin-bottom: 12px;
     font-size: 1rem;
 }
@@ -1157,8 +1163,8 @@ html, body {
 }
 
 .spinner {
-    border: 3px solid var(--light-red);
-    border-top: 3px solid var(--primary-red);
+    border: 3px solid #F8E8F0;
+    border-top: 3px solid var(--primary-pink);
     border-radius: 50%;
     width: 40px;
     height: 40px;
@@ -1232,7 +1238,7 @@ html, body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, var(--primary-red), var(--primary-yellow));
+    background: linear-gradient(180deg, var(--primary-pink), var(--primary-mint));
     border-radius: 4px;
 }
 
