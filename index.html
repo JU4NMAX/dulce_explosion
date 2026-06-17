@@ -7,28 +7,46 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- ANIMACIÓN DE DULCES EN LA PARTE SUPERIOR -->
+    <!-- MARQUESINA DE DULCES EXPANDIDA -->
     <div class="candy-banner">
         <div class="candy-track">
-            <div class="candy" style="--rotation: 0deg; --delay: 0s;">🍭</div>
-            <div class="candy" style="--rotation: 15deg; --delay: 0.5s;">🍬</div>
-            <div class="candy" style="--rotation: -10deg; --delay: 1s;">🍫</div>
-            <div class="candy" style="--rotation: 20deg; --delay: 1.5s;">🧁</div>
-            <div class="candy" style="--rotation: -15deg; --delay: 2s;">🍯</div>
-            <div class="candy" style="--rotation: 10deg; --delay: 2.5s;">🍪</div>
-            <div class="candy" style="--rotation: -20deg; --delay: 3s;">🎂</div>
-            <div class="candy" style="--rotation: 12deg; --delay: 3.5s;">🍖</div>
+            <div class="candy-item">🍭</div>
+            <div class="candy-item">🍬</div>
+            <div class="candy-item">🍫</div>
+            <div class="candy-item">🧁</div>
+            <div class="candy-item">🍯</div>
+            <div class="candy-item">🍪</div>
+            <div class="candy-item">🎂</div>
+            <div class="candy-item">🍩</div>
+            <div class="candy-item">🧂</div>
+            <div class="candy-item">🥐</div>
+            <div class="candy-item">🍖</div>
+            <div class="candy-item">🥨</div>
+            <!-- Repetición para efecto infinito -->
+            <div class="candy-item">🍭</div>
+            <div class="candy-item">🍬</div>
+            <div class="candy-item">🍫</div>
+            <div class="candy-item">🧁</div>
+            <div class="candy-item">🍯</div>
+            <div class="candy-item">🍪</div>
+            <div class="candy-item">🎂</div>
+            <div class="candy-item">🍩</div>
+            <div class="candy-item">🧂</div>
+            <div class="candy-item">🥐</div>
+            <div class="candy-item">🍖</div>
+            <div class="candy-item">🥨</div>
         </div>
     </div>
 
-    <!-- ENCABEZADO -->
+    <!-- HEADER CON LOGO -->
     <header class="header">
         <div class="container">
-            <div class="logo-section">
-                <h1 class="logo">🍭 Dulce Explosión 🍭</h1>
-                <p class="tagline">¡Tus dulces favoritos, a un click de distancia!</p>
+            <div class="logo-container">
+                <h1 class="logo-title">🍭 Dulce Explosión 🍭</h1>
+                <p class="logo-tagline">¡Tus dulces favoritos a un clic!</p>
             </div>
-            <div class="status-section">
+            
+            <div class="header-right">
                 <div class="status-indicator" id="statusIndicator">
                     <span class="status-dot" id="statusDot"></span>
                     <span class="status-text" id="statusText">Abierto</span>
@@ -40,75 +58,110 @@
         </div>
     </header>
 
+    <!-- PESTAÑAS PRINCIPALES -->
+    <div class="tabs-section">
+        <div class="container">
+            <button class="tab-button active" data-tab="productos">
+                🛍️ Productos
+            </button>
+            <button class="tab-button" data-tab="promociones">
+                ⭐ Promociones
+            </button>
+        </div>
+    </div>
+
     <!-- CONTENIDO PRINCIPAL -->
     <main class="main-content">
-        <!-- SECCIÓN DE FILTROS -->
-        <div class="filters-section">
-            <div class="container">
-                <button class="filter-btn active" data-category="todos">
-                    Todos los Dulces
-                </button>
-                <button class="filter-btn" data-category="chocolates">
-                    🍫 Chocolates y Chocolatinas
-                </button>
-                <button class="filter-btn" data-category="gomitas">
-                    🍬 Gomitas y Caramelos
-                </button>
-                <button class="filter-btn" data-category="snacks">
-                    🥨 Snacks y Pasabocas
-                </button>
-                <button class="filter-btn" data-category="promociones">
-                    ⭐ Promociones del Día
-                </button>
-            </div>
-        </div>
-
         <div class="container">
-            <!-- GALERÍA DE PRODUCTOS -->
-            <section class="products-section" id="productsSection">
-                <div class="products-grid" id="productsGrid">
-                    <!-- Los productos se cargan aquí con JavaScript -->
-                </div>
-            </section>
-
-            <!-- CARRITO -->
-            <aside class="cart-sidebar" id="cartSidebar">
-                <div class="cart-header">
-                    <h2>Tu Carrito</h2>
-                    <button class="close-cart" id="closeCart">✕</button>
-                </div>
-                
-                <div class="cart-items" id="cartItems">
-                    <p class="empty-message">Tu carrito está vacío</p>
-                </div>
-
-                <div class="cart-summary">
-                    <div class="summary-row">
-                        <span>Subtotal:</span>
-                        <span id="subtotal">$0</span>
+            <div class="content-wrapper">
+                <!-- SECCIÓN DE PRODUCTOS -->
+                <section class="products-section" id="productosTab">
+                    <div class="category-filters" id="categoryFilters">
+                        <!-- Se genera con JavaScript -->
                     </div>
-                    <div class="summary-row">
-                        <span>Total:</span>
-                        <span id="total" class="total-price">$0</span>
+                    <div class="products-grid" id="productsGrid">
+                        <!-- Los productos se cargan aquí -->
                     </div>
-                </div>
+                    <div class="loading-spinner" id="loadingSpinner">
+                        <div class="spinner"></div>
+                        <p>Cargando productos...</p>
+                    </div>
+                </section>
 
-                <button class="checkout-btn" id="checkoutBtn">
-                    Comprar por WhatsApp 📲
-                </button>
+                <!-- SECCIÓN DE PROMOCIONES -->
+                <section class="promotions-section" id="promocionesTab" style="display: none;">
+                    <div class="promotions-grid" id="promotionsGrid">
+                        <!-- Las promociones se cargan aquí -->
+                    </div>
+                    <div class="loading-spinner" id="loadingSpinnerPromo">
+                        <div class="spinner"></div>
+                        <p>Cargando promociones...</p>
+                    </div>
+                </section>
 
-                <button class="clear-cart-btn" id="clearCartBtn">
-                    Vaciar Carrito
-                </button>
-            </aside>
+                <!-- CARRITO (Desktop) -->
+                <aside class="cart-sidebar" id="cartSidebar">
+                    <div class="cart-header">
+                        <h2>🛒 Tu Carrito</h2>
+                        <button class="close-cart" id="closeCart">✕</button>
+                    </div>
+                    
+                    <div class="cart-items" id="cartItems">
+                        <p class="empty-message">Tu carrito está vacío</p>
+                    </div>
+
+                    <div class="cart-summary">
+                        <div class="summary-row">
+                            <span>Total:</span>
+                            <span id="total" class="total-price">$0</span>
+                        </div>
+                    </div>
+
+                    <button class="checkout-btn" id="checkoutBtn">
+                        Comprar por WhatsApp 📲
+                    </button>
+
+                    <button class="clear-cart-btn" id="clearCartBtn">
+                        Vaciar Carrito
+                    </button>
+                </aside>
+            </div>
         </div>
     </main>
 
-    <!-- MODAL DEL CARRITO (mobile) -->
-    <div class="modal-overlay" id="cartModal"></div>
+    <!-- CARRITO MODAL (Mobile) -->
+    <div class="cart-modal" id="cartModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Tu Carrito</h2>
+                <button class="modal-close" id="modalClose">✕</button>
+            </div>
+            
+            <div class="modal-items" id="modalItems">
+                <p class="empty-message">Tu carrito está vacío</p>
+            </div>
+
+            <div class="modal-summary">
+                <div class="summary-row">
+                    <span>Total:</span>
+                    <span id="modalTotal" class="total-price">$0</span>
+                </div>
+            </div>
+
+            <button class="checkout-btn" id="checkoutBtnModal">
+                Comprar por WhatsApp 📲
+            </button>
+
+            <button class="clear-cart-btn" id="clearCartBtnModal">
+                Vaciar Carrito
+            </button>
+        </div>
+    </div>
 
     <!-- BOTÓN FLOTANTE ADMIN -->
-    <button class="admin-access-btn" id="adminAccessBtn">⚙️</button>
+    <button class="admin-float-btn" id="adminFloatBtn" title="Panel de Administración">
+        ⚙️
+    </button>
 
     <!-- PANEL DE ADMINISTRACIÓN -->
     <div class="admin-panel" id="adminPanel">
@@ -118,22 +171,30 @@
                 <button class="admin-close" id="adminCloseBtn">✕</button>
             </div>
 
-            <!-- TAB: GESTIÓN DE PRODUCTOS -->
             <div class="admin-tabs">
-                <button class="admin-tab active" data-tab="manage">Gestionar Productos</button>
-                <button class="admin-tab" data-tab="add">Agregar Producto</button>
-                <button class="admin-tab" data-tab="settings">Configuración</button>
+                <button class="admin-tab active" data-admin-tab="productos">
+                    Gestionar Productos
+                </button>
+                <button class="admin-tab" data-admin-tab="agregar">
+                    Agregar Producto
+                </button>
+                <button class="admin-tab" data-admin-tab="categorias">
+                    Categorías
+                </button>
+                <button class="admin-tab" data-admin-tab="config">
+                    Configuración
+                </button>
             </div>
 
-            <!-- SECCIÓN: GESTIONAR PRODUCTOS -->
-            <div class="admin-content active" data-content="manage">
+            <!-- TAB: GESTIONAR PRODUCTOS -->
+            <div class="admin-content active" data-admin-content="productos">
                 <div class="products-admin-list" id="productsAdminList">
-                    <!-- Se cargan los productos para editar -->
+                    <p class="loading-text">Cargando productos...</p>
                 </div>
             </div>
 
-            <!-- SECCIÓN: AGREGAR PRODUCTO -->
-            <div class="admin-content" data-content="add">
+            <!-- TAB: AGREGAR PRODUCTO -->
+            <div class="admin-content" data-admin-content="agregar">
                 <form class="admin-form" id="addProductForm">
                     <div class="form-group">
                         <label>Nombre del Producto</label>
@@ -142,11 +203,7 @@
                     <div class="form-group">
                         <label>Categoría</label>
                         <select id="productCategory" required>
-                            <option value="">Selecciona una categoría</option>
-                            <option value="chocolates">Chocolates y Chocolatinas</option>
-                            <option value="gomitas">Gomitas y Caramelos</option>
-                            <option value="snacks">Snacks y Pasabocas</option>
-                            <option value="promociones">Promociones del Día</option>
+                            <option value="">Selecciona categoría</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -154,34 +211,58 @@
                         <input type="number" id="productPrice" min="0" step="0.01" required>
                     </div>
                     <div class="form-group">
-                        <label>Cantidad en Stock</label>
+                        <label>Stock</label>
                         <input type="number" id="productStock" min="0" required>
                     </div>
                     <div class="form-group">
-                        <label>Emoji (ej: 🍫, 🍬, 🧁)</label>
+                        <label>Emoji</label>
                         <input type="text" id="productEmoji" maxlength="2" value="🍭">
                     </div>
-                    <button type="submit" class="admin-submit-btn">Agregar Producto</button>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="isPromotion">
+                            ¿Es una promoción?
+                        </label>
+                    </div>
+                    <button type="submit" class="admin-btn-primary">Agregar Producto</button>
                 </form>
             </div>
 
-            <!-- SECCIÓN: CONFIGURACIÓN -->
-            <div class="admin-content" data-content="settings">
-                <div class="settings-group">
+            <!-- TAB: CATEGORÍAS -->
+            <div class="admin-content" data-admin-content="categorias">
+                <form class="admin-form" id="categoryForm">
+                    <div class="form-group">
+                        <label>Nombre de la Categoría</label>
+                        <input type="text" id="categoryName" placeholder="Ej: Chocolates" required>
+                    </div>
+                    <button type="submit" class="admin-btn-primary">Agregar Categoría</button>
+                </form>
+                <div class="categories-list" id="categoriesList">
+                    <p class="loading-text">Cargando categorías...</p>
+                </div>
+            </div>
+
+            <!-- TAB: CONFIGURACIÓN -->
+            <div class="admin-content" data-admin-content="config">
+                <div class="config-section">
                     <h3>Horario de Atención</h3>
-                    <div class="time-input-group">
-                        <label>Abre a las:</label>
-                        <input type="time" id="openTime" value="08:00">
+                    <div class="time-inputs">
+                        <div class="form-group">
+                            <label>Abre a las</label>
+                            <input type="time" id="openTime" value="08:00">
+                        </div>
+                        <div class="form-group">
+                            <label>Cierra a las</label>
+                            <input type="time" id="closeTime" value="20:00">
+                        </div>
+                        <button class="admin-btn-secondary" id="saveTimesBtn">
+                            Guardar Horario
+                        </button>
                     </div>
-                    <div class="time-input-group">
-                        <label>Cierra a las:</label>
-                        <input type="time" id="closeTime" value="20:00">
-                    </div>
-                    <button class="settings-save-btn" id="saveTimesBtn">Guardar Horario</button>
                 </div>
 
-                <div class="settings-group">
-                    <h3>Cambiar Contraseña Admin</h3>
+                <div class="config-section">
+                    <h3>Cambiar Contraseña</h3>
                     <div class="form-group">
                         <label>Contraseña Actual</label>
                         <input type="password" id="currentPassword">
@@ -190,12 +271,16 @@
                         <label>Nueva Contraseña</label>
                         <input type="password" id="newPassword">
                     </div>
-                    <button class="settings-save-btn" id="changePasswordBtn">Cambiar Contraseña</button>
+                    <button class="admin-btn-secondary" id="changePasswordBtn">
+                        Cambiar Contraseña
+                    </button>
                 </div>
 
-                <div class="settings-group danger">
-                    <h3>Zona de Peligro</h3>
-                    <button class="danger-btn" id="resetDataBtn">Eliminar Todos los Datos</button>
+                <div class="config-section danger">
+                    <h3>⚠️ Zona de Peligro</h3>
+                    <button class="admin-btn-danger" id="resetDataBtn">
+                        Reiniciar Todos los Datos
+                    </button>
                 </div>
             </div>
         </div>
@@ -204,15 +289,23 @@
     <!-- MODAL DE AUTENTICACIÓN ADMIN -->
     <div class="auth-modal" id="authModal">
         <div class="auth-box">
-            <h2>Acceso Admin</h2>
-            <p>Ingresa la contraseña para acceder</p>
-            <input type="password" id="adminPassword" placeholder="Contraseña">
-            <button id="authSubmitBtn">Ingresar</button>
-            <button id="authCancelBtn" class="secondary-btn">Cancelar</button>
+            <h2>🔐 Acceso Admin</h2>
+            <p>Ingresa tu contraseña</p>
+            <input type="password" id="adminPassword" placeholder="Contraseña" autocomplete="off">
+            <button id="authSubmitBtn" class="auth-btn">Ingresar</button>
+            <button id="authCancelBtn" class="auth-btn secondary">Cancelar</button>
         </div>
     </div>
 
-    <!-- SCRIPTS -->
+    <!-- OVERLAY -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- FIREBASE SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+
+    <!-- APP SCRIPTS -->
     <script src="app.js"></script>
 </body>
 </html>
