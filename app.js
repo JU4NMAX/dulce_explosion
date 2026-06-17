@@ -11,13 +11,13 @@ const WHATSAPP_NUMBER = "573222005193";
 
 // Reemplaza esto con tu configuración de Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyDummy_REEMPLAZA_CON_TU_API_KEY",
-    authDomain: "dulce-explosion.firebaseapp.com",
-    databaseURL: "https://dulce-explosion-default-rtdb.firebaseio.com",
-    projectId: "dulce-explosion",
-    storageBucket: "dulce-explosion.appspot.com",
-    messagingSenderId: "DUMMY_REEMPLAZA",
-    appId: "1:DUMMY_REEMPLAZA:web:DUMMY_REEMPLAZA"
+  apiKey: "AIzaSyCQ6JW8Hnwxzho54J40UxNy1D76Y3p3vrI",
+  authDomain: "dulce-explosion.firebaseapp.com",
+  databaseURL: "https://dulce-explosion-default-rtdb.firebaseio.com",
+  projectId: "dulce-explosion",
+  storageBucket: "dulce-explosion.firebasestorage.app",
+  messagingSenderId: "876850704117",
+  appId: "1:876850704117:web:3f169faa2585118faf5fbc"
 };
 
 // Inicializar Firebase
