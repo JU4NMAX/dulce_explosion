@@ -42,8 +42,11 @@
     <header class="header">
         <div class="container">
             <div class="logo-container">
-                <h1 class="logo-title">🍭 Dulce Explosión 🍭</h1>
-                <p class="logo-tagline">¡Tus dulces favoritos a un clic!</p>
+                <img src="logo.png" alt="Logo Dulce Explosión" class="store-logo" id="storeLogo" onerror="this.style.display='none'">
+                <div class="logo-text-wrap">
+                    <h1 class="logo-title">🍭 Dulce Explosión 🍭</h1>
+                    <p class="logo-tagline">¡Tus dulces favoritos a un clic!</p>
+                </div>
             </div>
             
             <div class="header-right">
@@ -57,6 +60,7 @@
             </div>
         </div>
     </header>
+
 
     <!-- PESTAÑAS PRINCIPALES -->
     <div class="tabs-section">
@@ -178,6 +182,9 @@
                 <button class="admin-tab" data-admin-tab="agregar">
                     Agregar Producto
                 </button>
+                <button class="admin-tab" data-admin-tab="combos">
+                    Combos
+                </button>
                 <button class="admin-tab" data-admin-tab="categorias">
                     Categorías
                 </button>
@@ -211,21 +218,50 @@
                         <input type="number" id="productPrice" min="0" step="0.01" required>
                     </div>
                     <div class="form-group">
-                        <label>Stock</label>
+                        <label>Cantidad</label>
                         <input type="number" id="productStock" min="0" required>
                     </div>
                     <div class="form-group">
-                        <label>Emoji</label>
-                        <input type="text" id="productEmoji" maxlength="2" value="🍭">
-                    </div>
-                    <div class="form-group">
-                        <label>
-                            <input type="checkbox" id="isPromotion">
-                            ¿Es una promoción?
-                        </label>
+                        <label>URL de la Imagen</label>
+                        <input type="url" id="productImage" placeholder="https://raw.githubusercontent.com/...">
+                        <small class="field-hint">Sube la foto a la carpeta /images de tu repositorio en GitHub y pega aquí la URL</small>
                     </div>
                     <button type="submit" class="admin-btn-primary">Agregar Producto</button>
                 </form>
+            </div>
+
+            <!-- TAB: COMBOS -->
+            <div class="admin-content" data-admin-content="combos">
+                <form class="admin-form" id="addComboForm">
+                    <div class="form-group">
+                        <label>Nombre del Combo</label>
+                        <input type="text" id="comboName" placeholder="Ej: Combo Dulce Pareja" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Producto 1</label>
+                        <select id="comboProduct1" required>
+                            <option value="">Selecciona producto</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Producto 2</label>
+                        <select id="comboProduct2" required>
+                            <option value="">Selecciona producto</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Precio Especial del Combo ($)</label>
+                        <input type="number" id="comboPrice" min="0" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>URL de la Imagen del Combo</label>
+                        <input type="url" id="comboImage" placeholder="https://raw.githubusercontent.com/...">
+                    </div>
+                    <button type="submit" class="admin-btn-primary">Crear Combo</button>
+                </form>
+                <div class="products-admin-list" id="combosAdminList">
+                    <p class="loading-text">Cargando combos...</p>
+                </div>
             </div>
 
             <!-- TAB: CATEGORÍAS -->
