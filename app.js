@@ -1,5 +1,5 @@
 // ===============================================
-// DULCE EXPLOSIÓN v2 - CON FIREBASE
+// DULCE EXPLOSIÓN v3 - IMÁGENES, LOGO Y COMBOS
 // ===============================================
 
 // CONFIGURACIÓN DE WHATSAPP
@@ -9,7 +9,6 @@ const WHATSAPP_NUMBER = "573222005193";
 // INICIALIZACIÓN DE FIREBASE
 // ===============================================
 
-// Reemplaza esto con tu configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyCQ6JW8Hnwxzho54J40UxNy1D76Y3p3vrI",
   authDomain: "dulce-explosion.firebaseapp.com",
@@ -30,6 +29,7 @@ const db = firebase.database();
 
 let state = {
     products: [],
+    combos: [],
     categories: ["Dulces", "Snacks"],
     cart: [],
     currentFilter: "todos",
@@ -38,6 +38,9 @@ let state = {
     openTime: "08:00",
     closeTime: "20:00"
 };
+
+// Placeholder cuando un producto no tiene imagen aún
+const PLACEHOLDER_IMG = "https://via.placeholder.com/300x300/F3A0C3/FFFFFF?text=Dulce+Explosion";
 
 // ===============================================
 // FUNCIONES UTILITARIAS
@@ -63,7 +66,7 @@ function updateStatusIndicator() {
     const isOpen = getIsOpen();
     const dot = document.getElementById("statusDot");
     const text = document.getElementById("statusText");
-    
+
     if (dot && text) {
         if (isOpen) {
             dot.className = "status-dot open";
@@ -80,12 +83,15 @@ function showNotification(message, type = "success") {
     if (type === "error") alert(message);
 }
 
+function getImageOrPlaceholder(imageUrl) {
+    return imageUrl && imageUrl.trim() !== "" ? imageUrl : PLACEHOLDER_IMG;
+}
+
 // ===============================================
 // CARGA DE DATOS DESDE FIREBASE
 // ===============================================
 
 function loadDataFromFirebase() {
-    // Cargar productos
     db.ref("products").on("value", (snapshot) => {
         const data = snapshot.val();
         if (data) {
@@ -97,10 +103,23 @@ function loadDataFromFirebase() {
             state.products = [];
         }
         renderProducts();
+        renderCombos();
         updateCartUI();
     });
 
-    // Cargar categorías
+    db.ref("combos").on("value", (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            state.combos = Object.keys(data).map(key => ({
+                id: key,
+                ...data[key]
+            }));
+        } else {
+            state.combos = [];
+        }
+        renderCombos();
+    });
+
     db.ref("categories").on("value", (snapshot) => {
         const data = snapshot.val();
         if (data) {
@@ -112,7 +131,6 @@ function loadDataFromFirebase() {
         updateAdminCategorySelect();
     });
 
-    // Cargar configuración
     db.ref("config").on("value", (snapshot) => {
         const data = snapshot.val();
         if (data) {
@@ -136,23 +154,15 @@ function loadDataFromFirebase() {
 function renderCategoryFilters() {
     const container = document.getElementById("categoryFilters");
     if (!container) return;
-    
-    let html = `
-        <button class="category-filter active" data-category="todos">
-            Todos
-        </button>
-    `;
-    
+
+    let html = `<button class="category-filter active" data-category="todos">Todos</button>`;
+
     state.categories.forEach(cat => {
-        html += `
-            <button class="category-filter" data-category="${cat.toLowerCase()}">
-                ${cat}
-            </button>
-        `;
+        html += `<button class="category-filter" data-category="${cat.toLowerCase()}">${cat}</button>`;
     });
-    
+
     container.innerHTML = html;
-    
+
     document.querySelectorAll(".category-filter").forEach(btn => {
         btn.addEventListener("click", () => {
             document.querySelectorAll(".category-filter").forEach(b => b.classList.remove("active"));
@@ -165,45 +175,50 @@ function renderCategoryFilters() {
 
 function renderProducts() {
     const grid = document.getElementById("productsGrid");
-    const promoGrid = document.getElementById("promotionsGrid");
-    
-    if (!grid || !promoGrid) return;
-    
-    // Filtrar productos normales
-    let normalProducts = state.products.filter(p => !p.isPromotion);
+    if (!grid) return;
+
+    let normalProducts = state.products;
     if (state.currentFilter !== "todos") {
-        normalProducts = normalProducts.filter(p => 
+        normalProducts = normalProducts.filter(p =>
             p.category.toLowerCase() === state.currentFilter
         );
     }
-    
-    // Productos para la sección de Productos
-    grid.innerHTML = normalProducts.map(product => createProductCard(product)).join("");
-    
-    // Productos para la sección de Promociones
-    const promos = state.products.filter(p => p.isPromotion);
-    promoGrid.innerHTML = promos.length > 0 
-        ? promos.map(product => createProductCard(product)).join("")
-        : '<p class="empty-message">Sin promociones disponibles</p>';
-    
+
+    grid.innerHTML = normalProducts.length > 0
+        ? normalProducts.map(product => createProductCard(product)).join("")
+        : '<p class="empty-message">Sin productos disponibles</p>';
+
     attachProductListeners();
+}
+
+function renderCombos() {
+    const promoGrid = document.getElementById("promotionsGrid");
+    if (!promoGrid) return;
+
+    promoGrid.innerHTML = state.combos.length > 0
+        ? state.combos.map(combo => createComboCard(combo)).join("")
+        : '<p class="empty-message">Sin promociones disponibles</p>';
+
+    attachComboListeners();
 }
 
 function createProductCard(product) {
     const isLowStock = product.stock <= 3 && product.stock > 0;
     const isOutOfStock = product.stock === 0;
-    const cartItem = state.cart.find(i => i.id === product.id);
-    
+    const cartItem = state.cart.find(i => i.id === product.id && i.type === "product");
+    const imageUrl = getImageOrPlaceholder(product.image);
+
     return `
         <div class="product-card" data-product-id="${product.id}">
-            ${product.isPromotion ? '<div class="promotion-badge">⭐ PROMO</div>' : ''}
-            <div class="product-emoji">${product.emoji || "🍭"}</div>
+            <div class="product-image-wrap">
+                <img src="${imageUrl}" alt="${product.name}" class="product-image" loading="lazy">
+            </div>
             <div class="product-info">
                 <h3 class="product-name">${product.name}</h3>
                 ${isLowStock ? '<div class="stock-alert">⚠️ Últimas unidades</div>' : ''}
                 <p class="product-stock">
-                    ${isOutOfStock 
-                        ? '<span style="color: #ff6b6b; font-weight: 700;">Agotado</span>' 
+                    ${isOutOfStock
+                        ? '<span style="color: #ff6b6b; font-weight: 700;">Agotado</span>'
                         : `Cantidad: ${product.stock}`}
                 </p>
                 <div class="product-price">${formatPrice(product.price)}</div>
@@ -218,8 +233,46 @@ function createProductCard(product) {
     `;
 }
 
+function createComboCard(combo) {
+    const product1 = state.products.find(p => p.id === combo.productId1);
+    const product2 = state.products.find(p => p.id === combo.productId2);
+    const maxAvailable = Math.min(
+        product1 ? product1.stock : 0,
+        product2 ? product2.stock : 0
+    );
+    const isOutOfStock = maxAvailable === 0;
+    const imageUrl = getImageOrPlaceholder(combo.image);
+
+    return `
+        <div class="product-card combo-card" data-combo-id="${combo.id}">
+            <div class="promotion-badge">⭐ COMBO</div>
+            <div class="product-image-wrap">
+                <img src="${imageUrl}" alt="${combo.name}" class="product-image" loading="lazy">
+            </div>
+            <div class="product-info">
+                <h3 class="product-name">${combo.name}</h3>
+                <p class="combo-includes">
+                    ${product1 ? product1.name : "Producto eliminado"} + ${product2 ? product2.name : "Producto eliminado"}
+                </p>
+                <p class="product-stock">
+                    ${isOutOfStock
+                        ? '<span style="color: #ff6b6b; font-weight: 700;">Agotado</span>'
+                        : `Cantidad disponible: ${maxAvailable}`}
+                </p>
+                <div class="product-price">${formatPrice(combo.price)}</div>
+                <div class="product-actions">
+                    <input type="number" class="quantity-input combo-quantity-input" value="1" min="1" max="${maxAvailable}" data-combo-id="${combo.id}">
+                    <button class="add-to-cart-btn add-combo-btn" data-combo-id="${combo.id}" ${isOutOfStock ? 'disabled' : ''}>
+                        🛒
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 function attachProductListeners() {
-    document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
+    document.querySelectorAll(".add-to-cart-btn:not(.add-combo-btn)").forEach(btn => {
         btn.addEventListener("click", () => {
             const productId = btn.dataset.productId;
             const qtyInput = document.querySelector(`.quantity-input[data-product-id="${productId}"]`);
@@ -228,11 +281,30 @@ function attachProductListeners() {
         });
     });
 
-    document.querySelectorAll(".quantity-input").forEach(input => {
+    document.querySelectorAll(".quantity-input:not(.combo-quantity-input)").forEach(input => {
         input.addEventListener("change", function() {
             const product = state.products.find(p => p.id === this.dataset.productId);
             if (!product) return;
             if (parseInt(this.value) > product.stock) this.value = product.stock;
+            if (parseInt(this.value) < 1) this.value = 1;
+        });
+    });
+}
+
+function attachComboListeners() {
+    document.querySelectorAll(".add-combo-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const comboId = btn.dataset.comboId;
+            const qtyInput = document.querySelector(`.combo-quantity-input[data-combo-id="${comboId}"]`);
+            const quantity = parseInt(qtyInput.value) || 1;
+            addComboToCart(comboId, quantity);
+        });
+    });
+
+    document.querySelectorAll(".combo-quantity-input").forEach(input => {
+        input.addEventListener("change", function() {
+            const max = parseInt(this.max) || 1;
+            if (parseInt(this.value) > max) this.value = max;
             if (parseInt(this.value) < 1) this.value = 1;
         });
     });
@@ -247,15 +319,15 @@ function addToCart(productId, quantity = 1) {
     if (!product) return;
 
     if (product.stock < quantity) {
-        alert("No hay suficiente stock");
+        alert("No hay suficiente cantidad disponible");
         return;
     }
 
-    const existingItem = state.cart.find(i => i.id === productId);
-    
+    const existingItem = state.cart.find(i => i.id === productId && i.type === "product");
+
     if (existingItem) {
         if (existingItem.quantity + quantity > product.stock) {
-            alert("No hay suficiente stock");
+            alert("No hay suficiente cantidad disponible");
             return;
         }
         existingItem.quantity += quantity;
@@ -265,8 +337,8 @@ function addToCart(productId, quantity = 1) {
             name: product.name,
             price: product.price,
             quantity: quantity,
-            emoji: product.emoji,
-            isPromotion: product.isPromotion || false
+            image: product.image,
+            type: "product"
         });
     }
 
@@ -274,26 +346,77 @@ function addToCart(productId, quantity = 1) {
     showNotification("Producto agregado al carrito", "success");
 }
 
-function removeFromCart(productId) {
-    state.cart = state.cart.filter(i => i.id !== productId);
+function addComboToCart(comboId, quantity = 1) {
+    const combo = state.combos.find(c => c.id === comboId);
+    if (!combo) return;
+
+    const product1 = state.products.find(p => p.id === combo.productId1);
+    const product2 = state.products.find(p => p.id === combo.productId2);
+    const maxAvailable = Math.min(
+        product1 ? product1.stock : 0,
+        product2 ? product2.stock : 0
+    );
+
+    if (maxAvailable < quantity) {
+        alert("No hay suficiente cantidad disponible para este combo");
+        return;
+    }
+
+    const existingItem = state.cart.find(i => i.id === comboId && i.type === "combo");
+
+    if (existingItem) {
+        if (existingItem.quantity + quantity > maxAvailable) {
+            alert("No hay suficiente cantidad disponible para este combo");
+            return;
+        }
+        existingItem.quantity += quantity;
+    } else {
+        state.cart.push({
+            id: comboId,
+            name: combo.name,
+            price: combo.price,
+            quantity: quantity,
+            image: combo.image,
+            type: "combo"
+        });
+    }
+
+    updateCartUI();
+    showNotification("Combo agregado al carrito", "success");
+}
+
+function removeFromCart(productId, type) {
+    state.cart = state.cart.filter(i => !(i.id === productId && i.type === type));
     updateCartUI();
 }
 
-function updateCartQuantity(productId, quantity) {
-    const item = state.cart.find(i => i.id === productId);
-    const product = state.products.find(p => p.id === productId);
-    
-    if (item && product) {
-        if (quantity > product.stock) {
-            alert("No hay suficiente stock");
-            return;
+function updateCartQuantity(productId, type, quantity) {
+    const item = state.cart.find(i => i.id === productId && i.type === type);
+    if (!item) return;
+
+    let maxAllowed = Infinity;
+
+    if (type === "combo") {
+        const combo = state.combos.find(c => c.id === productId);
+        if (combo) {
+            const product1 = state.products.find(p => p.id === combo.productId1);
+            const product2 = state.products.find(p => p.id === combo.productId2);
+            maxAllowed = Math.min(product1 ? product1.stock : 0, product2 ? product2.stock : 0);
         }
-        if (quantity <= 0) {
-            removeFromCart(productId);
-        } else {
-            item.quantity = quantity;
-            updateCartUI();
-        }
+    } else {
+        const product = state.products.find(p => p.id === productId);
+        maxAllowed = product ? product.stock : 0;
+    }
+
+    if (quantity > maxAllowed) {
+        alert("No hay suficiente cantidad disponible");
+        return;
+    }
+    if (quantity <= 0) {
+        removeFromCart(productId, type);
+    } else {
+        item.quantity = quantity;
+        updateCartUI();
     }
 }
 
@@ -306,7 +429,7 @@ function updateCartUI() {
     const modalItems = document.getElementById("modalItems");
     const cartCount = document.getElementById("cartCount");
     const total = calculateTotal();
-    
+
     if (cartCount) cartCount.textContent = state.cart.length;
 
     if (state.cart.length === 0) {
@@ -320,12 +443,12 @@ function updateCartUI() {
 
     const cartHtml = state.cart.map(item => `
         <div class="cart-item">
-            <div class="cart-item-name">${item.emoji || "🍭"} ${item.name}</div>
+            <div class="cart-item-name">${item.name}${item.type === "combo" ? " (Combo)" : ""}</div>
             <div class="cart-item-price">${formatPrice(item.price)} c/u</div>
             <div class="cart-item-controls">
-                <input type="number" class="cart-item-qty" value="${item.quantity}" min="1" data-product-id="${item.id}">
+                <input type="number" class="cart-item-qty" value="${item.quantity}" min="1" data-product-id="${item.id}" data-type="${item.type}">
                 <span style="color: #999;">= ${formatPrice(item.price * item.quantity)}</span>
-                <button class="cart-item-remove" data-product-id="${item.id}">✕</button>
+                <button class="cart-item-remove" data-product-id="${item.id}" data-type="${item.type}">✕</button>
             </div>
         </div>
     `).join("");
@@ -335,16 +458,15 @@ function updateCartUI() {
     if (document.getElementById("total")) document.getElementById("total").textContent = formatPrice(total);
     if (document.getElementById("modalTotal")) document.getElementById("modalTotal").textContent = formatPrice(total);
 
-    // Event listeners
     document.querySelectorAll(".cart-item-qty").forEach(input => {
         input.addEventListener("change", function() {
-            updateCartQuantity(this.dataset.productId, parseInt(this.value));
+            updateCartQuantity(this.dataset.productId, this.dataset.type, parseInt(this.value));
         });
     });
 
     document.querySelectorAll(".cart-item-remove").forEach(btn => {
         btn.addEventListener("click", () => {
-            removeFromCart(btn.dataset.productId);
+            removeFromCart(btn.dataset.productId, btn.dataset.type);
         });
     });
 }
@@ -372,10 +494,9 @@ function checkout() {
 
     const total = calculateTotal();
     let message = "¡Hola! Me gustaría comprar los siguientes productos:\n\n";
-    
-    // Añadimos 'index' como segundo parámetro para poder enumerar los productos correctamente
+
     state.cart.forEach((item, index) => {
-        message += `${index + 1}. ${item.emoji || "🍭"} ${item.name}\n`;
+        message += `${index + 1}. ${item.name}${item.type === "combo" ? " (Combo)" : ""}\n`;
         message += `   Cantidad: ${item.quantity}\n`;
         message += `   Precio unitario: ${formatPrice(item.price)}\n`;
         message += `   Subtotal: ${formatPrice(item.price * item.quantity)}\n\n`;
@@ -387,7 +508,6 @@ function checkout() {
     const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
     window.open(whatsappURL, "_blank");
 
-    // Limpiar carrito después de compra
     setTimeout(() => {
         state.cart = [];
         updateCartUI();
@@ -401,7 +521,7 @@ function checkout() {
 function toggleCartSidebar() {
     const sidebar = document.getElementById("cartSidebar");
     const modal = document.getElementById("cartModal");
-    
+
     if (sidebar) sidebar.classList.toggle("active");
     if (modal) modal.classList.toggle("active");
     if (document.getElementById("overlay")) document.getElementById("overlay").classList.toggle("active");
@@ -424,10 +544,10 @@ function hideAdminPanel() {
 
 function verifyAdminPassword() {
     const password = document.getElementById("adminPassword").value;
-    
+
     db.ref("config/adminPassword").once("value", (snapshot) => {
         const savedPassword = snapshot.val() || "1234";
-        
+
         if (password === savedPassword) {
             document.getElementById("authModal").classList.remove("active");
             document.getElementById("adminPanel").classList.add("active");
@@ -442,23 +562,26 @@ function verifyAdminPassword() {
 
 function renderAdminPanel() {
     renderAdminProducts();
+    renderAdminCombos();
     renderAdminCategories();
+    updateComboProductSelects();
     loadAdminSettings();
 }
 
 function renderAdminProducts() {
     const list = document.getElementById("productsAdminList");
     if (!list) return;
-    
+
     if (state.products.length === 0) {
         list.innerHTML = '<p class="loading-text">Sin productos</p>';
         return;
     }
-    
+
     list.innerHTML = state.products.map(product => `
         <div class="product-admin-item">
+            <img src="${getImageOrPlaceholder(product.image)}" alt="${product.name}" class="product-admin-thumb">
             <div class="product-admin-info">
-                <div class="product-admin-name">${product.emoji} ${product.name}</div>
+                <div class="product-admin-name">${product.name}</div>
                 <div class="product-admin-price">${formatPrice(product.price)}</div>
                 <div class="product-admin-stock">Cantidad: <strong>${product.stock}</strong></div>
             </div>
@@ -471,7 +594,6 @@ function renderAdminProducts() {
         </div>
     `).join("");
 
-    // Event listeners
     document.querySelectorAll(".plus-btn").forEach(btn => {
         btn.addEventListener("click", () => {
             modifyStock(btn.dataset.productId, 1);
@@ -493,6 +615,44 @@ function renderAdminProducts() {
     });
 }
 
+function renderAdminCombos() {
+    const list = document.getElementById("combosAdminList");
+    if (!list) return;
+
+    if (state.combos.length === 0) {
+        list.innerHTML = '<p class="loading-text">Sin combos creados</p>';
+        return;
+    }
+
+    list.innerHTML = state.combos.map(combo => {
+        const product1 = state.products.find(p => p.id === combo.productId1);
+        const product2 = state.products.find(p => p.id === combo.productId2);
+        return `
+            <div class="product-admin-item">
+                <img src="${getImageOrPlaceholder(combo.image)}" alt="${combo.name}" class="product-admin-thumb">
+                <div class="product-admin-info">
+                    <div class="product-admin-name">${combo.name}</div>
+                    <div class="product-admin-price">${formatPrice(combo.price)}</div>
+                    <div class="product-admin-stock">
+                        ${product1 ? product1.name : "Eliminado"} + ${product2 ? product2.name : "Eliminado"}
+                    </div>
+                </div>
+                <div class="stock-controls">
+                    <button class="delete-btn" data-combo-id="${combo.id}">Eliminar</button>
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    document.querySelectorAll("#combosAdminList .delete-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            if (confirm("¿Eliminar este combo?")) {
+                deleteCombo(btn.dataset.comboId);
+            }
+        });
+    });
+}
+
 function modifyStock(productId, amount) {
     const product = state.products.find(p => p.id === productId);
     if (product) {
@@ -503,7 +663,7 @@ function modifyStock(productId, amount) {
 
 function deleteProduct(productId) {
     db.ref(`products/${productId}`).remove();
-    state.cart = state.cart.filter(i => i.id !== productId);
+    state.cart = state.cart.filter(i => !(i.id === productId && i.type === "product"));
 }
 
 function addProduct() {
@@ -512,8 +672,7 @@ function addProduct() {
     const category = document.getElementById("productCategory").value;
     const price = parseFloat(document.getElementById("productPrice").value);
     const stock = parseInt(document.getElementById("productStock").value);
-    const emoji = document.getElementById("productEmoji").value.trim() || "🍭";
-    const isPromotion = document.getElementById("isPromotion").checked;
+    const image = document.getElementById("productImage").value.trim();
 
     if (!name || !category || isNaN(price) || isNaN(stock) || stock < 0) {
         alert("Completa todos los campos correctamente");
@@ -526,8 +685,7 @@ function addProduct() {
         category,
         price,
         stock,
-        emoji,
-        isPromotion,
+        image,
         createdAt: new Date().toISOString()
     });
 
@@ -535,10 +693,59 @@ function addProduct() {
     alert("Producto agregado correctamente");
 }
 
+function addCombo() {
+    const form = document.getElementById("addComboForm");
+    const name = document.getElementById("comboName").value.trim();
+    const productId1 = document.getElementById("comboProduct1").value;
+    const productId2 = document.getElementById("comboProduct2").value;
+    const price = parseFloat(document.getElementById("comboPrice").value);
+    const image = document.getElementById("comboImage").value.trim();
+
+    if (!name || !productId1 || !productId2 || isNaN(price)) {
+        alert("Completa todos los campos correctamente");
+        return;
+    }
+
+    if (productId1 === productId2) {
+        alert("Selecciona dos productos diferentes");
+        return;
+    }
+
+    const newComboRef = db.ref("combos").push();
+    newComboRef.set({
+        name,
+        productId1,
+        productId2,
+        price,
+        image,
+        createdAt: new Date().toISOString()
+    });
+
+    form.reset();
+    alert("Combo agregado correctamente");
+}
+
+function deleteCombo(comboId) {
+    db.ref(`combos/${comboId}`).remove();
+    state.cart = state.cart.filter(i => !(i.id === comboId && i.type === "combo"));
+}
+
+function updateComboProductSelects() {
+    const select1 = document.getElementById("comboProduct1");
+    const select2 = document.getElementById("comboProduct2");
+    if (!select1 || !select2) return;
+
+    const options = '<option value="">Selecciona producto</option>' +
+        state.products.map(p => `<option value="${p.id}">${p.name}</option>`).join("");
+
+    select1.innerHTML = options;
+    select2.innerHTML = options;
+}
+
 function renderAdminCategories() {
     const list = document.getElementById("categoriesList");
     if (!list) return;
-    
+
     list.innerHTML = state.categories.map((cat, idx) => `
         <div class="category-admin-item">
             <span>${cat}</span>
@@ -554,7 +761,6 @@ function renderAdminCategories() {
     });
 }
 
-//
 function addCategory() {
     const form = document.getElementById("categoryForm");
     const name = document.getElementById("categoryName").value.trim();
@@ -651,23 +857,20 @@ function resetAllData() {
 // ===============================================
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Cargar datos desde Firebase
     loadDataFromFirebase();
     updateStatusIndicator();
 
-    // Eventos de pestañas
     document.querySelectorAll(".tab-button").forEach(btn => {
         btn.addEventListener("click", () => {
             document.querySelectorAll(".tab-button").forEach(b => b.classList.remove("active"));
             document.querySelectorAll(".products-section, .promotions-section").forEach(s => s.style.display = "none");
-            
+
             btn.classList.add("active");
             const tab = btn.dataset.tab;
             document.getElementById(`${tab}Tab`).style.display = "block";
         });
     });
 
-    // Carrito
     if (document.getElementById("cartButton")) document.getElementById("cartButton").addEventListener("click", toggleCartSidebar);
     if (document.getElementById("closeCart")) document.getElementById("closeCart").addEventListener("click", toggleCartSidebar);
     if (document.getElementById("modalClose")) document.getElementById("modalClose").addEventListener("click", toggleCartSidebar);
@@ -678,7 +881,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("clearCartBtn")) document.getElementById("clearCartBtn").addEventListener("click", clearCart);
     if (document.getElementById("clearCartBtnModal")) document.getElementById("clearCartBtnModal").addEventListener("click", clearCart);
 
-    // Admin
     if (document.getElementById("adminFloatBtn")) document.getElementById("adminFloatBtn").addEventListener("click", showAdminPanel);
     if (document.getElementById("adminCloseBtn")) document.getElementById("adminCloseBtn").addEventListener("click", hideAdminPanel);
     if (document.getElementById("authSubmitBtn")) document.getElementById("authSubmitBtn").addEventListener("click", verifyAdminPassword);
@@ -691,22 +893,27 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Admin tabs
     document.querySelectorAll(".admin-tab").forEach(tab => {
         tab.addEventListener("click", () => {
             document.querySelectorAll(".admin-tab").forEach(t => t.classList.remove("active"));
             document.querySelectorAll(".admin-content").forEach(c => c.classList.remove("active"));
-            
+
             tab.classList.add("active");
             document.querySelector(`[data-admin-content="${tab.dataset.adminTab}"]`).classList.add("active");
         });
     });
 
-    // Admin forms
     if (document.getElementById("addProductForm")) {
         document.getElementById("addProductForm").addEventListener("submit", (e) => {
             e.preventDefault();
             addProduct();
+        });
+    }
+
+    if (document.getElementById("addComboForm")) {
+        document.getElementById("addComboForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            addCombo();
         });
     }
 
@@ -721,7 +928,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("changePasswordBtn")) document.getElementById("changePasswordBtn").addEventListener("click", changePassword);
     if (document.getElementById("resetDataBtn")) document.getElementById("resetDataBtn").addEventListener("click", resetAllData);
 
-    // Cerrar admin modal al hacer click fuera
     if (document.getElementById("adminPanel")) {
         document.getElementById("adminPanel").addEventListener("click", (e) => {
             if (e.target.id === "adminPanel") hideAdminPanel();
@@ -735,5 +941,4 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Actualizar estado cada minuto
 setInterval(updateStatusIndicator, 60000);
