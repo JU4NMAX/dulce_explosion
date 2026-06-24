@@ -182,8 +182,8 @@
                 <button class="admin-tab" data-admin-tab="agregar">
                     Agregar Producto
                 </button>
-                <button class="admin-tab" data-admin-tab="combos">
-                    Combos
+                <button class="admin-tab" data-admin-tab="promociones">
+                    Promociones
                 </button>
                 <button class="admin-tab" data-admin-tab="categorias">
                     Categorías
@@ -230,12 +230,12 @@
                 </form>
             </div>
 
-            <!-- TAB: COMBOS -->
-            <div class="admin-content" data-admin-content="combos">
+            <!-- TAB: PROMOCIONES -->
+            <div class="admin-content" data-admin-content="promociones">
                 <form class="admin-form" id="addComboForm">
                     <div class="form-group">
-                        <label>Nombre del Combo</label>
-                        <input type="text" id="comboName" placeholder="Ej: Combo Dulce Pareja" required>
+                        <label>Nombre de la Promoción</label>
+                        <input type="text" id="comboName" placeholder="Ej: Promoción Dulce Pareja" required>
                     </div>
                     <div class="form-group">
                         <label>Producto 1</label>
@@ -250,17 +250,17 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Precio Especial del Combo ($)</label>
+                        <label>Precio Especial de la Promoción ($)</label>
                         <input type="number" id="comboPrice" min="0" step="0.01" required>
                     </div>
                     <div class="form-group">
-                        <label>URL de la Imagen del Combo</label>
+                        <label>URL de la Imagen de la Promoción</label>
                         <input type="url" id="comboImage" placeholder="https://raw.githubusercontent.com/...">
                     </div>
-                    <button type="submit" class="admin-btn-primary">Crear Combo</button>
+                    <button type="submit" class="admin-btn-primary">Crear Promoción</button>
                 </form>
                 <div class="products-admin-list" id="combosAdminList">
-                    <p class="loading-text">Cargando combos...</p>
+                    <p class="loading-text">Cargando promociones...</p>
                 </div>
             </div>
 
@@ -318,6 +318,40 @@
                         Reiniciar Todos los Datos
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDICIÓN DE PRODUCTO -->
+    <div class="edit-modal" id="editProductModal">
+        <div class="edit-modal-box">
+            <h2>✏️ Editar Producto</h2>
+            <input type="hidden" id="editProductId">
+            <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" id="editProductName" required>
+            </div>
+            <div class="form-group">
+                <label>Categoría</label>
+                <select id="editProductCategory">
+                    <option value="">Selecciona categoría</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Precio ($)</label>
+                <input type="number" id="editProductPrice" min="0" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label>Cantidad</label>
+                <input type="number" id="editProductStock" min="0" required>
+            </div>
+            <div class="form-group">
+                <label>URL de la Imagen</label>
+                <input type="url" id="editProductImage" placeholder="https://raw.githubusercontent.com/...">
+            </div>
+            <div class="edit-modal-buttons">
+                <button class="admin-btn-primary" id="saveEditProductBtn">Guardar Cambios</button>
+                <button class="admin-btn-secondary" id="cancelEditProductBtn">Cancelar</button>
             </div>
         </div>
     </div>
