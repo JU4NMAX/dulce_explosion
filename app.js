@@ -95,7 +95,20 @@ function showNotification(message, type = "success") {
 }
 
 function getImageOrPlaceholder(imageUrl) {
-    return imageUrl && imageUrl.trim() !== "" ? imageUrl : PLACEHOLDER_IMG;
+    return imageUrl && imageUrl.trim() !== "" ? toRawUrl(imageUrl) : PLACEHOLDER_IMG;
+}
+
+function toRawUrl(url) {
+    if (!url) return url;
+    // Convertir URL normal de GitHub a raw automáticamente
+    // De: https://github.com/USER/REPO/blob/HASH/images/foto.jpg
+    // A:  https://raw.githubusercontent.com/USER/REPO/HASH/images/foto.jpg
+    if (url.includes("github.com") && url.includes("/blob/")) {
+        return url
+            .replace("github.com", "raw.githubusercontent.com")
+            .replace("/blob/", "/");
+    }
+    return url;
 }
 
 function calcAndShowChange(inputId, rowId, amtId) {
@@ -769,7 +782,7 @@ function addProduct() {
         category,
         price,
         stock,
-        image,
+        image: toRawUrl(image),
         createdAt: new Date().toISOString()
     });
 
@@ -801,7 +814,7 @@ function addCombo() {
         productId1,
         productId2,
         price,
-        image,
+        image: toRawUrl(image),
         createdAt: new Date().toISOString()
     });
 
@@ -986,7 +999,7 @@ function saveEditProduct() {
         category,
         price,
         stock,
-        image
+        image: toRawUrl(image)
     }).then(() => {
         alert("Producto actualizado correctamente");
         closeEditProductModal();
