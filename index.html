@@ -75,7 +75,17 @@
     </div>
 
     <!-- CONTENIDO PRINCIPAL -->
-    <main class="main-content">
+    <!-- PANTALLA DE TIENDA CERRADA -->
+    <div class="closed-screen" id="closedScreen" style="display:none;">
+        <div class="closed-content">
+            <div class="closed-icon">🔒</div>
+            <h2 class="closed-title">CERRADO</h2>
+            <p class="closed-message" id="closedMessage">Vuelve a las <strong id="openTimeDisplay">08:00</strong></p>
+            <p class="closed-sub">¡Te esperamos con los mejores dulces! 🍭</p>
+        </div>
+    </div>
+
+    <main class="main-content" id="mainContent">
         <div class="container">
             <div class="content-wrapper">
                 <!-- SECCIÓN DE PRODUCTOS -->
@@ -119,6 +129,14 @@
                             <span>Total:</span>
                             <span id="total" class="total-price">$0</span>
                         </div>
+                        <div class="payment-section">
+                            <label class="payment-label">¿Con cuánto vas a pagar?</label>
+                            <input type="number" id="paymentAmount" class="payment-input" placeholder="Ej: 20000" min="0">
+                            <div class="change-row" id="changeRow" style="display:none;">
+                                <span>Tu devuelta:</span>
+                                <span id="changeAmount" class="change-amount">$0</span>
+                            </div>
+                        </div>
                     </div>
 
                     <button class="checkout-btn" id="checkoutBtn">
@@ -149,6 +167,14 @@
                 <div class="summary-row">
                     <span>Total:</span>
                     <span id="modalTotal" class="total-price">$0</span>
+                </div>
+                <div class="payment-section">
+                    <label class="payment-label">¿Con cuánto vas a pagar?</label>
+                    <input type="number" id="paymentAmountModal" class="payment-input" placeholder="Ej: 20000" min="0">
+                    <div class="change-row" id="changeRowModal" style="display:none;">
+                        <span>Tu devuelta:</span>
+                        <span id="changeAmountModal" class="change-amount">$0</span>
+                    </div>
                 </div>
             </div>
 
