@@ -34,6 +34,7 @@ let state = {
     cart: [],
     currentFilter: "todos",
     isAdmin: false,
+    adminUnlocked: false,
     adminPassword: "1234",
     openTime: "08:00",
     closeTime: "20:00"
@@ -81,14 +82,10 @@ function updateStatusIndicator() {
     }
 
     if (closedScreen && mainContent) {
-        if (isOpen) {
-            closedScreen.style.display = "none";
-            mainContent.style.display = "block";
-        } else {
-            closedScreen.style.display = "flex";
-            mainContent.style.display = "none";
-            if (openTimeDisplay) openTimeDisplay.textContent = state.openTime;
-        }
+        const showStore = isOpen || state.adminUnlocked;
+        closedScreen.style.display = showStore ? "none" : "flex";
+        mainContent.style.display = showStore ? "block" : "none";
+        if (!isOpen && openTimeDisplay) openTimeDisplay.textContent = state.openTime;
     }
 }
 
@@ -627,6 +624,11 @@ function verifyAdminPassword() {
             document.getElementById("authModal").classList.remove("active");
             document.getElementById("adminPanel").classList.add("active");
             state.isAdmin = true;
+            // Si la tienda está cerrada, desbloquear vista temporalmente
+            if (!getIsOpen()) {
+                state.adminUnlocked = true;
+                updateStatusIndicator();
+            }
             renderAdminPanel();
             document.getElementById("adminPassword").value = "";
         } else {
@@ -1023,6 +1025,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("clearCartBtnModal")) document.getElementById("clearCartBtnModal").addEventListener("click", clearCart);
 
     if (document.getElementById("adminFloatBtn")) document.getElementById("adminFloatBtn").addEventListener("click", showAdminPanel);
+    if (document.getElementById("closedAdminBtn")) document.getElementById("closedAdminBtn").addEventListener("click", showAdminPanel);
 
     // Pago y devuelta
     const payInput = document.getElementById("paymentAmount");
