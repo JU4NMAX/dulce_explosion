@@ -1,5 +1,5 @@
 // ===============================================
-// DULCE EXPLOSIÓN v3 - IMÁGENES, LOGO Y COMBOS
+// DULCE EXPLOSIÓN v5 - IMÁGENES, LOGO Y COMBOS
 // ===============================================
 
 // CONFIGURACIÓN DE WHATSAPP
@@ -443,11 +443,15 @@ function updateCartUI() {
 
     const cartHtml = state.cart.map(item => `
         <div class="cart-item">
-            <div class="cart-item-name">${item.name}${item.type === "combo" ? " (Combo)" : ""}</div>
+            <div class="cart-item-name">${item.name}${item.type === "combo" ? " (Promoción)" : ""}</div>
             <div class="cart-item-price">${formatPrice(item.price)} c/u</div>
             <div class="cart-item-controls">
-                <input type="number" class="cart-item-qty" value="${item.quantity}" min="1" data-product-id="${item.id}" data-type="${item.type}">
-                <span style="color: #999;">= ${formatPrice(item.price * item.quantity)}</span>
+                <div class="cart-qty-wrap">
+                    <button class="cart-qty-btn cart-qty-minus" data-product-id="${item.id}" data-type="${item.type}">−</button>
+                    <input type="number" class="cart-item-qty" value="${item.quantity}" min="1" data-product-id="${item.id}" data-type="${item.type}">
+                    <button class="cart-qty-btn cart-qty-plus" data-product-id="${item.id}" data-type="${item.type}">+</button>
+                </div>
+                <span class="cart-item-subtotal">= ${formatPrice(item.price * item.quantity)}</span>
                 <button class="cart-item-remove" data-product-id="${item.id}" data-type="${item.type}">✕</button>
             </div>
         </div>
@@ -461,6 +465,20 @@ function updateCartUI() {
     document.querySelectorAll(".cart-item-qty").forEach(input => {
         input.addEventListener("change", function() {
             updateCartQuantity(this.dataset.productId, this.dataset.type, parseInt(this.value));
+        });
+    });
+
+    document.querySelectorAll(".cart-qty-minus").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const item = state.cart.find(i => i.id === btn.dataset.productId && i.type === btn.dataset.type);
+            if (item) updateCartQuantity(btn.dataset.productId, btn.dataset.type, item.quantity - 1);
+        });
+    });
+
+    document.querySelectorAll(".cart-qty-plus").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const item = state.cart.find(i => i.id === btn.dataset.productId && i.type === btn.dataset.type);
+            if (item) updateCartQuantity(btn.dataset.productId, btn.dataset.type, item.quantity + 1);
         });
     });
 
@@ -589,6 +607,7 @@ function renderAdminProducts() {
                 <button class="stock-btn minus-btn" data-product-id="${product.id}">−</button>
                 <div class="stock-display" id="stock-${product.id}">${product.stock}</div>
                 <button class="stock-btn plus-btn" data-product-id="${product.id}">+</button>
+                <button class="edit-btn" data-product-id="${product.id}">Editar</button>
                 <button class="delete-btn" data-product-id="${product.id}">Eliminar</button>
             </div>
         </div>
@@ -603,6 +622,12 @@ function renderAdminProducts() {
     document.querySelectorAll(".minus-btn").forEach(btn => {
         btn.addEventListener("click", () => {
             modifyStock(btn.dataset.productId, -1);
+        });
+    });
+
+    document.querySelectorAll(".edit-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            openEditProductModal(btn.dataset.productId);
         });
     });
 
@@ -853,6 +878,65 @@ function resetAllData() {
 }
 
 // ===============================================
+// EDICIÓN DE PRODUCTOS
+// ===============================================
+
+function openEditProductModal(productId) {
+    const product = state.products.find(p => p.id === productId);
+    if (!product) return;
+
+    document.getElementById("editProductId").value = productId;
+    document.getElementById("editProductName").value = product.name;
+    document.getElementById("editProductPrice").value = product.price;
+    document.getElementById("editProductStock").value = product.stock;
+    document.getElementById("editProductImage").value = product.image || "";
+
+    // Poblar select de categorías
+    const select = document.getElementById("editProductCategory");
+    select.innerHTML = '<option value="">Selecciona categoría</option>';
+    state.categories.forEach(cat => {
+        const option = document.createElement("option");
+        option.value = cat;
+        option.textContent = cat;
+        if (cat === product.category) option.selected = true;
+        select.appendChild(option);
+    });
+
+    document.getElementById("editProductModal").classList.add("active");
+}
+
+function closeEditProductModal() {
+    document.getElementById("editProductModal").classList.remove("active");
+}
+
+function saveEditProduct() {
+    const productId = document.getElementById("editProductId").value;
+    const name = document.getElementById("editProductName").value.trim();
+    const category = document.getElementById("editProductCategory").value;
+    const price = parseFloat(document.getElementById("editProductPrice").value);
+    const stock = parseInt(document.getElementById("editProductStock").value);
+    const image = document.getElementById("editProductImage").value.trim();
+
+    if (!name || !category || isNaN(price) || isNaN(stock) || stock < 0) {
+        alert("Completa todos los campos correctamente");
+        return;
+    }
+
+    db.ref(`products/${productId}`).update({
+        name,
+        category,
+        price,
+        stock,
+        image
+    }).then(() => {
+        alert("Producto actualizado correctamente");
+        closeEditProductModal();
+    }).catch(() => {
+        alert("Error al guardar los cambios");
+    });
+}
+
+// ===============================================
 // INICIALIZACIÓN
 // ===============================================
 
@@ -923,6 +1007,9 @@ document.addEventListener("DOMContentLoaded", () => {
             addCategory();
         });
     }
+
+    if (document.getElementById("saveEditProductBtn")) document.getElementById("saveEditProductBtn").addEventListener("click", saveEditProduct);
+    if (document.getElementById("cancelEditProductBtn")) document.getElementById("cancelEditProductBtn").addEventListener("click", closeEditProductModal);
 
     if (document.getElementById("saveTimesBtn")) document.getElementById("saveTimesBtn").addEventListener("click", saveTimes);
     if (document.getElementById("changePasswordBtn")) document.getElementById("changePasswordBtn").addEventListener("click", changePassword);
