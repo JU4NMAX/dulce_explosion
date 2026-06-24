@@ -1,5 +1,5 @@
 // ===============================================
-// DULCE EXPLOSIÓN v5 - IMÁGENES, LOGO Y COMBOS
+// DULCE EXPLOSIÓN v3 - IMÁGENES, LOGO Y COMBOS
 // ===============================================
 
 // CONFIGURACIÓN DE WHATSAPP
@@ -66,6 +66,9 @@ function updateStatusIndicator() {
     const isOpen = getIsOpen();
     const dot = document.getElementById("statusDot");
     const text = document.getElementById("statusText");
+    const closedScreen = document.getElementById("closedScreen");
+    const mainContent = document.getElementById("mainContent");
+    const openTimeDisplay = document.getElementById("openTimeDisplay");
 
     if (dot && text) {
         if (isOpen) {
@@ -74,6 +77,17 @@ function updateStatusIndicator() {
         } else {
             dot.className = "status-dot closed";
             text.textContent = "Cerrado";
+        }
+    }
+
+    if (closedScreen && mainContent) {
+        if (isOpen) {
+            closedScreen.style.display = "none";
+            mainContent.style.display = "block";
+        } else {
+            closedScreen.style.display = "flex";
+            mainContent.style.display = "none";
+            if (openTimeDisplay) openTimeDisplay.textContent = state.openTime;
         }
     }
 }
@@ -85,6 +99,37 @@ function showNotification(message, type = "success") {
 
 function getImageOrPlaceholder(imageUrl) {
     return imageUrl && imageUrl.trim() !== "" ? imageUrl : PLACEHOLDER_IMG;
+}
+
+function calcAndShowChange(inputId, rowId, amtId) {
+    const el = document.getElementById(inputId);
+    const rowEl = document.getElementById(rowId);
+    const amtEl = document.getElementById(amtId);
+    if (!el || !rowEl || !amtEl) return;
+
+    const paid = parseFloat(el.value) || 0;
+    const total = calculateTotal();
+
+    if (paid > 0 && total > 0) {
+        const change = paid - total;
+        rowEl.style.display = "flex";
+        amtEl.textContent = formatPrice(Math.abs(change));
+        if (change >= 0) {
+            amtEl.className = "change-amount";
+            rowEl.querySelector("span").textContent = "Tu devuelta:";
+        } else {
+            amtEl.className = "change-amount change-negative";
+            rowEl.querySelector("span").textContent = "Te faltan:";
+        }
+    } else {
+        rowEl.style.display = "none";
+    }
+}
+
+function getPaymentInfo() {
+    const desktop = parseFloat(document.getElementById("paymentAmount")?.value) || 0;
+    const mobile = parseFloat(document.getElementById("paymentAmountModal")?.value) || 0;
+    return desktop || mobile;
 }
 
 // ===============================================
@@ -245,7 +290,7 @@ function createComboCard(combo) {
 
     return `
         <div class="product-card combo-card" data-combo-id="${combo.id}">
-            <div class="promotion-badge">⭐ COMBO</div>
+            <div class="promotion-badge">⭐ PROMO</div>
             <div class="product-image-wrap">
                 <img src="${imageUrl}" alt="${combo.name}" class="product-image" loading="lazy">
             </div>
@@ -358,7 +403,7 @@ function addComboToCart(comboId, quantity = 1) {
     );
 
     if (maxAvailable < quantity) {
-        alert("No hay suficiente cantidad disponible para este combo");
+        alert("No hay suficiente cantidad disponible para esta promoción");
         return;
     }
 
@@ -366,7 +411,7 @@ function addComboToCart(comboId, quantity = 1) {
 
     if (existingItem) {
         if (existingItem.quantity + quantity > maxAvailable) {
-            alert("No hay suficiente cantidad disponible para este combo");
+            alert("No hay suficiente cantidad disponible para esta promoción");
             return;
         }
         existingItem.quantity += quantity;
@@ -382,7 +427,7 @@ function addComboToCart(comboId, quantity = 1) {
     }
 
     updateCartUI();
-    showNotification("Combo agregado al carrito", "success");
+    showNotification("Promoción agregada al carrito", "success");
 }
 
 function removeFromCart(productId, type) {
@@ -511,17 +556,29 @@ function checkout() {
     }
 
     const total = calculateTotal();
+    const paid = getPaymentInfo();
     let message = "¡Hola! Me gustaría comprar los siguientes productos:\n\n";
 
     state.cart.forEach((item, index) => {
-        message += `${index + 1}. ${item.name}${item.type === "combo" ? " (Combo)" : ""}\n`;
+        message += `${index + 1}. ${item.name}${item.type === "combo" ? " (Promoción)" : ""}\n`;
         message += `   Cantidad: ${item.quantity}\n`;
         message += `   Precio unitario: ${formatPrice(item.price)}\n`;
         message += `   Subtotal: ${formatPrice(item.price * item.quantity)}\n\n`;
     });
 
-    message += `--- TOTAL A PAGAR: ${formatPrice(total)} ---\n\n`;
-    message += "¡Gracias por comprar en Dulce Explosión! 🍭";
+    message += `--- TOTAL A PAGAR: ${formatPrice(total)} ---\n`;
+
+    if (paid > 0) {
+        const change = paid - total;
+        message += `Pago con: ${formatPrice(paid)}\n`;
+        if (change >= 0) {
+            message += `Devuelta: ${formatPrice(change)}\n`;
+        } else {
+            message += `(Me faltan: ${formatPrice(Math.abs(change))})\n`;
+        }
+    }
+
+    message += "\n¡Gracias por comprar en Dulce Explosión! 🍭";
 
     const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
     window.open(whatsappURL, "_blank");
@@ -645,7 +702,7 @@ function renderAdminCombos() {
     if (!list) return;
 
     if (state.combos.length === 0) {
-        list.innerHTML = '<p class="loading-text">Sin combos creados</p>';
+        list.innerHTML = '<p class="loading-text">Sin promociones creadas</p>';
         return;
     }
 
@@ -671,7 +728,7 @@ function renderAdminCombos() {
 
     document.querySelectorAll("#combosAdminList .delete-btn").forEach(btn => {
         btn.addEventListener("click", () => {
-            if (confirm("¿Eliminar este combo?")) {
+            if (confirm("¿Eliminar esta promoción?")) {
                 deleteCombo(btn.dataset.comboId);
             }
         });
@@ -966,6 +1023,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("clearCartBtnModal")) document.getElementById("clearCartBtnModal").addEventListener("click", clearCart);
 
     if (document.getElementById("adminFloatBtn")) document.getElementById("adminFloatBtn").addEventListener("click", showAdminPanel);
+
+    // Pago y devuelta
+    const payInput = document.getElementById("paymentAmount");
+    if (payInput) payInput.addEventListener("input", () => calcAndShowChange("paymentAmount", "changeRow", "changeAmount"));
+    const payInputModal = document.getElementById("paymentAmountModal");
+    if (payInputModal) payInputModal.addEventListener("input", () => calcAndShowChange("paymentAmountModal", "changeRowModal", "changeAmountModal"));
     if (document.getElementById("adminCloseBtn")) document.getElementById("adminCloseBtn").addEventListener("click", hideAdminPanel);
     if (document.getElementById("authSubmitBtn")) document.getElementById("authSubmitBtn").addEventListener("click", verifyAdminPassword);
     if (document.getElementById("authCancelBtn")) document.getElementById("authCancelBtn").addEventListener("click", hideAdminPanel);
