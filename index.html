@@ -203,32 +203,35 @@
             </div>
 
             <div class="admin-tabs">
-                <button class="admin-tab active" data-admin-tab="productos">
-                    Gestionar Productos
+                <button class="admin-tab active" data-admin-tab="editar">
+                    ✏️ Editar
                 </button>
                 <button class="admin-tab" data-admin-tab="agregar">
-                    Agregar Producto
-                </button>
-                <button class="admin-tab" data-admin-tab="promociones">
-                    Promociones
+                    ➕ Agregar
                 </button>
                 <button class="admin-tab" data-admin-tab="categorias">
-                    Categorías
+                    🏷️ Categorías
                 </button>
                 <button class="admin-tab" data-admin-tab="config">
-                    Configuración
+                    ⚙️ Config
                 </button>
             </div>
 
-            <!-- TAB: GESTIONAR PRODUCTOS -->
-            <div class="admin-content active" data-admin-content="productos">
+            <!-- TAB: EDITAR (Productos + Promociones) -->
+            <div class="admin-content active" data-admin-content="editar">
+                <h3 class="admin-section-title">Productos</h3>
                 <div class="products-admin-list" id="productsAdminList">
                     <p class="loading-text">Cargando productos...</p>
                 </div>
+                <h3 class="admin-section-title" style="margin-top:20px;">Promociones</h3>
+                <div class="products-admin-list" id="combosAdminList">
+                    <p class="loading-text">Cargando promociones...</p>
+                </div>
             </div>
 
-            <!-- TAB: AGREGAR PRODUCTO -->
+            <!-- TAB: AGREGAR (Producto + Promoción) -->
             <div class="admin-content" data-admin-content="agregar">
+                <h3 class="admin-section-title">Agregar Producto</h3>
                 <form class="admin-form" id="addProductForm">
                     <div class="form-group">
                         <label>Nombre del Producto</label>
@@ -250,19 +253,17 @@
                     </div>
                     <div class="form-group">
                         <label>URL de la Imagen</label>
-                        <input type="url" id="productImage" placeholder="https://raw.githubusercontent.com/...">
-                        <small class="field-hint">Sube la foto a la carpeta /images de tu repositorio en GitHub y pega aquí la URL</small>
+                        <input type="url" id="productImage" placeholder="https://github.com/JU4NMAX/...">
+                        <small class="field-hint">Puedes pegar el link de GitHub directamente, se convierte automáticamente</small>
                     </div>
                     <button type="submit" class="admin-btn-primary">Agregar Producto</button>
                 </form>
-            </div>
 
-            <!-- TAB: PROMOCIONES -->
-            <div class="admin-content" data-admin-content="promociones">
+                <h3 class="admin-section-title" style="margin-top:24px;">Agregar Promoción</h3>
                 <form class="admin-form" id="addComboForm">
                     <div class="form-group">
                         <label>Nombre de la Promoción</label>
-                        <input type="text" id="comboName" placeholder="Ej: Promoción Dulce Pareja" required>
+                        <input type="text" id="comboName" placeholder="Ej: 2 Nucitas por menos" required>
                     </div>
                     <div class="form-group">
                         <label>Producto 1</label>
@@ -271,24 +272,21 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Producto 2</label>
+                        <label>Producto 2 (puede ser el mismo)</label>
                         <select id="comboProduct2" required>
                             <option value="">Selecciona producto</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Precio Especial de la Promoción ($)</label>
+                        <label>Precio Especial ($)</label>
                         <input type="number" id="comboPrice" min="0" step="0.01" required>
                     </div>
                     <div class="form-group">
-                        <label>URL de la Imagen de la Promoción</label>
-                        <input type="url" id="comboImage" placeholder="https://raw.githubusercontent.com/...">
+                        <label>URL de la Imagen</label>
+                        <input type="url" id="comboImage" placeholder="https://github.com/JU4NMAX/...">
                     </div>
                     <button type="submit" class="admin-btn-primary">Crear Promoción</button>
                 </form>
-                <div class="products-admin-list" id="combosAdminList">
-                    <p class="loading-text">Cargando promociones...</p>
-                </div>
             </div>
 
             <!-- TAB: CATEGORÍAS -->
@@ -374,11 +372,47 @@
             </div>
             <div class="form-group">
                 <label>URL de la Imagen</label>
-                <input type="url" id="editProductImage" placeholder="https://raw.githubusercontent.com/...">
+                <input type="url" id="editProductImage" placeholder="https://github.com/JU4NMAX/...">
             </div>
             <div class="edit-modal-buttons">
                 <button class="admin-btn-primary" id="saveEditProductBtn">Guardar Cambios</button>
                 <button class="admin-btn-secondary" id="cancelEditProductBtn">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDICIÓN DE PROMOCIÓN -->
+    <div class="edit-modal" id="editComboModal">
+        <div class="edit-modal-box">
+            <h2>✏️ Editar Promoción</h2>
+            <input type="hidden" id="editComboId">
+            <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" id="editComboName" required>
+            </div>
+            <div class="form-group">
+                <label>Producto 1</label>
+                <select id="editComboProduct1">
+                    <option value="">Selecciona producto</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Producto 2 (puede ser el mismo)</label>
+                <select id="editComboProduct2">
+                    <option value="">Selecciona producto</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Precio Especial ($)</label>
+                <input type="number" id="editComboPrice" min="0" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label>URL de la Imagen</label>
+                <input type="url" id="editComboImage" placeholder="https://github.com/JU4NMAX/...">
+            </div>
+            <div class="edit-modal-buttons">
+                <button class="admin-btn-primary" id="saveEditComboBtn">Guardar Cambios</button>
+                <button class="admin-btn-secondary" id="cancelEditComboBtn">Cancelar</button>
             </div>
         </div>
     </div>
