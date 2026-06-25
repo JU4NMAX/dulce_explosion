@@ -91,8 +91,16 @@
             <div class="content-wrapper">
                 <!-- SECCIÓN DE PRODUCTOS -->
                 <section class="products-section" id="productosTab">
-                    <div class="category-filters" id="categoryFilters">
-                        <!-- Se genera con JavaScript -->
+                    <div class="filters-row">
+                        <div class="category-filters" id="categoryFilters">
+                            <!-- Se genera con JavaScript -->
+                        </div>
+                        <select class="sort-select" id="sortProducts">
+                            <option value="az">A → Z</option>
+                            <option value="za">Z → A</option>
+                            <option value="stock-desc">Mayor cantidad</option>
+                            <option value="stock-asc">Menor cantidad</option>
+                        </select>
                     </div>
                     <div class="products-grid" id="productsGrid">
                         <!-- Los productos se cargan aquí -->
@@ -105,6 +113,12 @@
 
                 <!-- SECCIÓN DE PROMOCIONES -->
                 <section class="promotions-section" id="promocionesTab" style="display: none;">
+                    <div class="filters-row" style="justify-content: flex-end;">
+                        <select class="sort-select" id="sortPromos">
+                            <option value="az">A → Z</option>
+                            <option value="za">Z → A</option>
+                        </select>
+                    </div>
                     <div class="promotions-grid" id="promotionsGrid">
                         <!-- Las promociones se cargan aquí -->
                     </div>
