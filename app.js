@@ -98,6 +98,33 @@ function getImageOrPlaceholder(imageUrl) {
     return imageUrl && imageUrl.trim() !== "" ? toRawUrl(imageUrl) : PLACEHOLDER_IMG;
 }
 
+// Calcula cuántas unidades de un producto están "reservadas" en el carrito actual
+// (tanto como producto individual como dentro de promociones)
+function getReservedStock(productId) {
+    let reserved = 0;
+    state.cart.forEach(item => {
+        if (item.type === "product" && item.id === productId) {
+            reserved += item.quantity;
+        }
+        if (item.type === "combo") {
+            const combo = state.combos.find(c => c.id === item.id);
+            if (combo) {
+                if (combo.productId1 === productId) reserved += item.quantity;
+                if (combo.productId2 === productId) reserved += item.quantity;
+                // Si los dos productos son el mismo, cuenta doble
+            }
+        }
+    });
+    return reserved;
+}
+
+// Stock disponible real = stock en Firebase - lo que ya está en el carrito
+function getAvailableStock(productId) {
+    const product = state.products.find(p => p.id === productId);
+    if (!product) return 0;
+    return Math.max(0, product.stock - getReservedStock(productId));
+}
+
 function toRawUrl(url) {
     if (!url) return url;
     // Convertir URL normal de GitHub a raw automáticamente
@@ -258,8 +285,9 @@ function renderCombos() {
 }
 
 function createProductCard(product) {
-    const isLowStock = product.stock <= 3 && product.stock > 0;
-    const isOutOfStock = product.stock === 0;
+    const available = getAvailableStock(product.id);
+    const isLowStock = available <= 3 && available > 0;
+    const isOutOfStock = available === 0;
     const cartItem = state.cart.find(i => i.id === product.id && i.type === "product");
     const imageUrl = getImageOrPlaceholder(product.image);
 
@@ -274,11 +302,11 @@ function createProductCard(product) {
                 <p class="product-stock">
                     ${isOutOfStock
                         ? '<span style="color: #ff6b6b; font-weight: 700;">Agotado</span>'
-                        : `Cantidad: ${product.stock}`}
+                        : `Cantidad: ${available}`}
                 </p>
                 <div class="product-price">${formatPrice(product.price)}</div>
                 <div class="product-actions">
-                    <input type="number" class="quantity-input" value="${cartItem?.quantity || 1}" min="1" max="${product.stock}" data-product-id="${product.id}">
+                    <input type="number" class="quantity-input" value="1" min="1" max="${available}" data-product-id="${product.id}">
                     <button class="add-to-cart-btn" data-product-id="${product.id}" ${isOutOfStock ? 'disabled' : ''}>
                         🛒
                     </button>
@@ -291,10 +319,18 @@ function createProductCard(product) {
 function createComboCard(combo) {
     const product1 = state.products.find(p => p.id === combo.productId1);
     const product2 = state.products.find(p => p.id === combo.productId2);
-    const maxAvailable = Math.min(
-        product1 ? product1.stock : 0,
-        product2 ? product2.stock : 0
-    );
+    const sameProduct = combo.productId1 === combo.productId2;
+    let maxAvailable;
+
+    if (sameProduct) {
+        maxAvailable = Math.floor(getAvailableStock(combo.productId1) / 2);
+    } else {
+        maxAvailable = Math.min(
+            getAvailableStock(combo.productId1),
+            getAvailableStock(combo.productId2)
+        );
+    }
+
     const isOutOfStock = maxAvailable === 0;
     const imageUrl = getImageOrPlaceholder(combo.image);
 
@@ -373,18 +409,15 @@ function addToCart(productId, quantity = 1) {
     const product = state.products.find(p => p.id === productId);
     if (!product) return;
 
-    if (product.stock < quantity) {
-        alert("No hay suficiente cantidad disponible");
+    const available = getAvailableStock(productId);
+    if (available < quantity) {
+        alert(`Solo hay ${available} unidades disponibles (el resto están en tu carrito o en una promoción)`);
         return;
     }
 
     const existingItem = state.cart.find(i => i.id === productId && i.type === "product");
 
     if (existingItem) {
-        if (existingItem.quantity + quantity > product.stock) {
-            alert("No hay suficiente cantidad disponible");
-            return;
-        }
         existingItem.quantity += quantity;
     } else {
         state.cart.push({
@@ -398,6 +431,8 @@ function addToCart(productId, quantity = 1) {
     }
 
     updateCartUI();
+    renderProducts();
+    renderCombos();
     showNotification("Producto agregado al carrito", "success");
 }
 
@@ -405,25 +440,28 @@ function addComboToCart(comboId, quantity = 1) {
     const combo = state.combos.find(c => c.id === comboId);
     if (!combo) return;
 
-    const product1 = state.products.find(p => p.id === combo.productId1);
-    const product2 = state.products.find(p => p.id === combo.productId2);
-    const maxAvailable = Math.min(
-        product1 ? product1.stock : 0,
-        product2 ? product2.stock : 0
-    );
+    // Disponible real considerando todo lo que ya está en el carrito
+    const sameProduct = combo.productId1 === combo.productId2;
+    let maxAvailable;
+
+    if (sameProduct) {
+        // Si son el mismo producto, cada unidad del combo consume 2 del stock
+        const available = getAvailableStock(combo.productId1);
+        maxAvailable = Math.floor(available / 2);
+    } else {
+        const available1 = getAvailableStock(combo.productId1);
+        const available2 = getAvailableStock(combo.productId2);
+        maxAvailable = Math.min(available1, available2);
+    }
 
     if (maxAvailable < quantity) {
-        alert("No hay suficiente cantidad disponible para esta promoción");
+        alert(`Solo hay ${maxAvailable} promociones disponibles con el stock actual`);
         return;
     }
 
     const existingItem = state.cart.find(i => i.id === comboId && i.type === "combo");
 
     if (existingItem) {
-        if (existingItem.quantity + quantity > maxAvailable) {
-            alert("No hay suficiente cantidad disponible para esta promoción");
-            return;
-        }
         existingItem.quantity += quantity;
     } else {
         state.cart.push({
@@ -437,12 +475,16 @@ function addComboToCart(comboId, quantity = 1) {
     }
 
     updateCartUI();
+    renderProducts();
+    renderCombos();
     showNotification("Promoción agregada al carrito", "success");
 }
 
 function removeFromCart(productId, type) {
     state.cart = state.cart.filter(i => !(i.id === productId && i.type === type));
     updateCartUI();
+    renderProducts();
+    renderCombos();
 }
 
 function updateCartQuantity(productId, type, quantity) {
@@ -472,6 +514,8 @@ function updateCartQuantity(productId, type, quantity) {
     } else {
         item.quantity = quantity;
         updateCartUI();
+        renderProducts();
+        renderCombos();
     }
 }
 
@@ -673,7 +717,7 @@ function renderAdminProducts() {
             <div class="product-admin-info">
                 <div class="product-admin-name">${product.name}</div>
                 <div class="product-admin-price">${formatPrice(product.price)}</div>
-                <div class="product-admin-stock">Cantidad: <strong>${product.stock}</strong></div>
+                <div class="product-admin-stock">Cantidad: <strong id="stock-label-${product.id}">${product.stock}</strong></div>
             </div>
             <div class="stock-controls">
                 <button class="stock-btn minus-btn" data-product-id="${product.id}">−</button>
@@ -761,11 +805,13 @@ function modifyStock(productId, amount) {
     const product = state.products.find(p => p.id === productId);
     if (product) {
         const newStock = Math.max(0, product.stock + amount);
-        // Actualizar localmente de inmediato para que se vea en admin al instante
         product.stock = newStock;
+        // Actualizar número grande del contador
         const display = document.getElementById(`stock-${productId}`);
         if (display) display.textContent = newStock;
-        // Luego sincronizar con Firebase
+        // Actualizar texto "Cantidad: X" debajo del nombre
+        const stockLabel = document.getElementById(`stock-label-${productId}`);
+        if (stockLabel) stockLabel.textContent = newStock;
         db.ref(`products/${productId}/stock`).set(newStock);
     }
 }
