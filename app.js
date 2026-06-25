@@ -1,5 +1,5 @@
 // ===============================================
-// DULCE EXPLOSIÓN v3 - IMÁGENES, LOGO Y COMBOS
+// DULCE EXPLOSIÓN v5 - IMÁGENES, LOGO Y COMBOS
 // ===============================================
 
 // CONFIGURACIÓN DE WHATSAPP
@@ -477,35 +477,66 @@ function removeFromCart(productId, type) {
     renderCombos();
 }
 
+function getMaxAllowedForCartItem(productId, type) {
+    // Calcula el máximo que puede tener este item específico,
+    // contando todo lo que ya hay en el carrito EXCEPTO este item
+    if (type === "combo") {
+        const combo = state.combos.find(c => c.id === productId);
+        if (!combo) return 0;
+        const sameProduct = combo.productId1 === combo.productId2;
+
+        // Stock bruto de cada producto
+        const p1 = state.products.find(p => p.id === combo.productId1);
+        const p2 = state.products.find(p => p.id === combo.productId2);
+        const stock1 = p1 ? p1.stock : 0;
+        const stock2 = p2 ? p2.stock : 0;
+
+        // Reservado por OTROS items del carrito (no este combo)
+        let otherReserved1 = 0;
+        let otherReserved2 = 0;
+        state.cart.forEach(item => {
+            if (item.id === productId && item.type === "combo") return; // Skip este
+            if (item.type === "product" && item.id === combo.productId1) otherReserved1 += item.quantity;
+            if (item.type === "product" && item.id === combo.productId2) otherReserved2 += item.quantity;
+            if (item.type === "combo") {
+                const c = state.combos.find(c2 => c2.id === item.id);
+                if (c) {
+                    if (c.productId1 === combo.productId1) otherReserved1 += item.quantity;
+                    if (c.productId2 === combo.productId1) otherReserved1 += item.quantity;
+                    if (c.productId1 === combo.productId2) otherReserved2 += item.quantity;
+                    if (c.productId2 === combo.productId2) otherReserved2 += item.quantity;
+                }
+            }
+        });
+
+        const avail1 = Math.max(0, stock1 - otherReserved1);
+        const avail2 = Math.max(0, stock2 - otherReserved2);
+
+        if (sameProduct) return Math.floor(avail1 / 2);
+        return Math.min(avail1, avail2);
+    } else {
+        const product = state.products.find(p => p.id === productId);
+        if (!product) return 0;
+        let otherReserved = 0;
+        state.cart.forEach(item => {
+            if (item.id === productId && item.type === "product") return; // Skip este
+            if (item.type === "combo") {
+                const c = state.combos.find(c2 => c2.id === item.id);
+                if (c) {
+                    if (c.productId1 === productId) otherReserved += item.quantity;
+                    if (c.productId2 === productId) otherReserved += item.quantity;
+                }
+            }
+        });
+        return Math.max(0, product.stock - otherReserved);
+    }
+}
+
 function updateCartQuantity(productId, type, quantity) {
     const item = state.cart.find(i => i.id === productId && i.type === type);
     if (!item) return;
 
-    // Calculamos cuánto más podría agregar: disponible real + lo que ya tiene en carrito
-    let maxAllowed;
-    if (type === "combo") {
-        const combo = state.combos.find(c => c.id === productId);
-        if (combo) {
-            const sameProduct = combo.productId1 === combo.productId2;
-            // Disponible sin contar este item, para calcular el techo real
-            const currentQty = item.quantity;
-            item.quantity = 0; // temporal para que getAvailableStock no lo cuente
-            if (sameProduct) {
-                maxAllowed = Math.floor(getAvailableStock(combo.productId1) / 2);
-            } else {
-                maxAllowed = Math.min(
-                    getAvailableStock(combo.productId1),
-                    getAvailableStock(combo.productId2)
-                );
-            }
-            item.quantity = currentQty; // restaurar
-        }
-    } else {
-        const currentQty = item.quantity;
-        item.quantity = 0;
-        maxAllowed = getAvailableStock(productId);
-        item.quantity = currentQty;
-    }
+    const maxAllowed = getMaxAllowedForCartItem(productId, type);
 
     if (quantity > maxAllowed) {
         alert(`Máximo disponible: ${maxAllowed}`);
@@ -520,6 +551,19 @@ function updateCartQuantity(productId, type, quantity) {
         renderProducts();
         renderCombos();
     }
+}
+
+function updateCheckoutButton() {
+    const hasItems = state.cart.length > 0;
+    const paid = getPaymentInfo();
+    const total = calculateTotal();
+    const hasPaid = paid > 0 && paid >= total;
+
+    const enabled = hasItems && hasPaid;
+    ["checkoutBtn", "checkoutBtnModal"].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.disabled = !enabled;
+    });
 }
 
 function calculateTotal() {
@@ -589,6 +633,8 @@ function updateCartUI() {
             removeFromCart(btn.dataset.productId, btn.dataset.type);
         });
     });
+
+    updateCheckoutButton();
 }
 
 function clearCart() {
@@ -599,6 +645,8 @@ function clearCart() {
     if (confirm("¿Vaciar el carrito?")) {
         state.cart = [];
         updateCartUI();
+        renderProducts();
+        renderCombos();
     }
 }
 
@@ -714,7 +762,9 @@ function renderAdminProducts() {
         return;
     }
 
-    list.innerHTML = state.products.map(product => `
+    const sorted = [...state.products].sort((a, b) => a.name.localeCompare(b.name));
+
+    list.innerHTML = sorted.map(product => `
         <div class="product-admin-item">
             <img src="${getImageOrPlaceholder(product.image)}" alt="${product.name}" class="product-admin-thumb">
             <div class="product-admin-info">
@@ -768,7 +818,8 @@ function renderAdminCombos() {
         return;
     }
 
-    list.innerHTML = state.combos.map(combo => {
+    const sortedCombos = [...state.combos].sort((a, b) => a.name.localeCompare(b.name));
+    list.innerHTML = sortedCombos.map(combo => {
         const product1 = state.products.find(p => p.id === combo.productId1);
         const product2 = state.products.find(p => p.id === combo.productId2);
         return `
@@ -1059,6 +1110,7 @@ function saveEditProduct() {
     }).then(() => {
         alert("Producto actualizado correctamente");
         closeEditProductModal();
+        renderAdminPanel();
     }).catch(() => {
         alert("Error al guardar los cambios");
     });
@@ -1109,6 +1161,7 @@ function saveEditCombo() {
     }).then(() => {
         alert("Promoción actualizada correctamente");
         closeEditComboModal();
+        renderAdminPanel();
     }).catch(() => {
         alert("Error al guardar los cambios");
     });
@@ -1154,9 +1207,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Pago y devuelta
     const payInput = document.getElementById("paymentAmount");
-    if (payInput) payInput.addEventListener("input", () => calcAndShowChange("paymentAmount", "changeRow", "changeAmount"));
+    if (payInput) payInput.addEventListener("input", () => {
+        calcAndShowChange("paymentAmount", "changeRow", "changeAmount");
+        updateCheckoutButton();
+    });
     const payInputModal = document.getElementById("paymentAmountModal");
-    if (payInputModal) payInputModal.addEventListener("input", () => calcAndShowChange("paymentAmountModal", "changeRowModal", "changeAmountModal"));
+    if (payInputModal) payInputModal.addEventListener("input", () => {
+        calcAndShowChange("paymentAmountModal", "changeRowModal", "changeAmountModal");
+        updateCheckoutButton();
+    });
     if (document.getElementById("adminCloseBtn")) document.getElementById("adminCloseBtn").addEventListener("click", hideAdminPanel);
     if (document.getElementById("authSubmitBtn")) document.getElementById("authSubmitBtn").addEventListener("click", verifyAdminPassword);
     if (document.getElementById("authCancelBtn")) document.getElementById("authCancelBtn").addEventListener("click", hideAdminPanel);
