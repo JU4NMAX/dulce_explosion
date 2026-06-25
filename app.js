@@ -255,16 +255,28 @@ function renderCategoryFilters() {
     });
 }
 
+function sortItems(items, sortValue) {
+    return [...items].sort((a, b) => {
+        if (sortValue === "az") return a.name.localeCompare(b.name);
+        if (sortValue === "za") return b.name.localeCompare(a.name);
+        if (sortValue === "stock-desc") return (b.stock || 0) - (a.stock || 0);
+        if (sortValue === "stock-asc") return (a.stock || 0) - (b.stock || 0);
+        return a.name.localeCompare(b.name);
+    });
+}
+
 function renderProducts() {
     const grid = document.getElementById("productsGrid");
     if (!grid) return;
 
+    const sortValue = document.getElementById("sortProducts")?.value || "az";
     let normalProducts = state.products;
     if (state.currentFilter !== "todos") {
         normalProducts = normalProducts.filter(p =>
             p.category.toLowerCase() === state.currentFilter
         );
     }
+    normalProducts = sortItems(normalProducts, sortValue);
 
     grid.innerHTML = normalProducts.length > 0
         ? normalProducts.map(product => createProductCard(product)).join("")
@@ -277,8 +289,11 @@ function renderCombos() {
     const promoGrid = document.getElementById("promotionsGrid");
     if (!promoGrid) return;
 
-    promoGrid.innerHTML = state.combos.length > 0
-        ? state.combos.map(combo => createComboCard(combo)).join("")
+    const sortValue = document.getElementById("sortPromos")?.value || "az";
+    const sorted = sortItems(state.combos, sortValue);
+
+    promoGrid.innerHTML = sorted.length > 0
+        ? sorted.map(combo => createComboCard(combo)).join("")
         : '<p class="empty-message">Sin promociones disponibles</p>';
 
     attachComboListeners();
@@ -306,9 +321,8 @@ function createProductCard(product) {
                 </p>
                 <div class="product-price">${formatPrice(product.price)}</div>
                 <div class="product-actions">
-                    <input type="number" class="quantity-input" value="1" min="1" max="${available}" data-product-id="${product.id}">
                     <button class="add-to-cart-btn" data-product-id="${product.id}" ${isOutOfStock ? 'disabled' : ''}>
-                        🛒
+                        🛒 Agregar
                     </button>
                 </div>
             </div>
@@ -352,9 +366,8 @@ function createComboCard(combo) {
                 </p>
                 <div class="product-price">${formatPrice(combo.price)}</div>
                 <div class="product-actions">
-                    <input type="number" class="quantity-input combo-quantity-input" value="1" min="1" max="${maxAvailable}" data-combo-id="${combo.id}">
                     <button class="add-to-cart-btn add-combo-btn" data-combo-id="${combo.id}" ${isOutOfStock ? 'disabled' : ''}>
-                        🛒
+                        🛒 Agregar
                     </button>
                 </div>
             </div>
@@ -365,19 +378,7 @@ function createComboCard(combo) {
 function attachProductListeners() {
     document.querySelectorAll(".add-to-cart-btn:not(.add-combo-btn)").forEach(btn => {
         btn.addEventListener("click", () => {
-            const productId = btn.dataset.productId;
-            const qtyInput = document.querySelector(`.quantity-input[data-product-id="${productId}"]`);
-            const quantity = parseInt(qtyInput.value) || 1;
-            addToCart(productId, quantity);
-        });
-    });
-
-    document.querySelectorAll(".quantity-input:not(.combo-quantity-input)").forEach(input => {
-        input.addEventListener("change", function() {
-            const product = state.products.find(p => p.id === this.dataset.productId);
-            if (!product) return;
-            if (parseInt(this.value) > product.stock) this.value = product.stock;
-            if (parseInt(this.value) < 1) this.value = 1;
+            addToCart(btn.dataset.productId, 1);
         });
     });
 }
@@ -385,18 +386,7 @@ function attachProductListeners() {
 function attachComboListeners() {
     document.querySelectorAll(".add-combo-btn").forEach(btn => {
         btn.addEventListener("click", () => {
-            const comboId = btn.dataset.comboId;
-            const qtyInput = document.querySelector(`.combo-quantity-input[data-combo-id="${comboId}"]`);
-            const quantity = parseInt(qtyInput.value) || 1;
-            addComboToCart(comboId, quantity);
-        });
-    });
-
-    document.querySelectorAll(".combo-quantity-input").forEach(input => {
-        input.addEventListener("change", function() {
-            const max = parseInt(this.max) || 1;
-            if (parseInt(this.value) > max) this.value = max;
-            if (parseInt(this.value) < 1) this.value = 1;
+            addComboToCart(btn.dataset.comboId, 1);
         });
     });
 }
@@ -491,22 +481,35 @@ function updateCartQuantity(productId, type, quantity) {
     const item = state.cart.find(i => i.id === productId && i.type === type);
     if (!item) return;
 
-    let maxAllowed = Infinity;
-
+    // Calculamos cuánto más podría agregar: disponible real + lo que ya tiene en carrito
+    let maxAllowed;
     if (type === "combo") {
         const combo = state.combos.find(c => c.id === productId);
         if (combo) {
-            const product1 = state.products.find(p => p.id === combo.productId1);
-            const product2 = state.products.find(p => p.id === combo.productId2);
-            maxAllowed = Math.min(product1 ? product1.stock : 0, product2 ? product2.stock : 0);
+            const sameProduct = combo.productId1 === combo.productId2;
+            // Disponible sin contar este item, para calcular el techo real
+            const currentQty = item.quantity;
+            item.quantity = 0; // temporal para que getAvailableStock no lo cuente
+            if (sameProduct) {
+                maxAllowed = Math.floor(getAvailableStock(combo.productId1) / 2);
+            } else {
+                maxAllowed = Math.min(
+                    getAvailableStock(combo.productId1),
+                    getAvailableStock(combo.productId2)
+                );
+            }
+            item.quantity = currentQty; // restaurar
         }
     } else {
-        const product = state.products.find(p => p.id === productId);
-        maxAllowed = product ? product.stock : 0;
+        const currentQty = item.quantity;
+        item.quantity = 0;
+        maxAllowed = getAvailableStock(productId);
+        item.quantity = currentQty;
     }
 
     if (quantity > maxAllowed) {
-        alert("No hay suficiente cantidad disponible");
+        alert(`Máximo disponible: ${maxAllowed}`);
+        updateCartUI();
         return;
     }
     if (quantity <= 0) {
@@ -614,13 +617,13 @@ function checkout() {
     let message = "¡Hola! Me gustaría comprar los siguientes productos:\n\n";
 
     state.cart.forEach((item, index) => {
-        message += `${index + 1}. ${item.name}${item.type === "combo" ? " (Promoción)" : ""}\n`;
+        message += `${index + 1}. *${item.name}${item.type === "combo" ? " (Promoción)" : ""}*\n`;
         message += `   Cantidad: ${item.quantity}\n`;
         message += `   Precio unitario: ${formatPrice(item.price)}\n`;
         message += `   Subtotal: ${formatPrice(item.price * item.quantity)}\n\n`;
     });
 
-    message += `--- TOTAL A PAGAR: ${formatPrice(total)} ---\n`;
+    message += `--- *TOTAL A PAGAR: ${formatPrice(total)}* ---\n`;
 
     if (paid > 0) {
         const change = paid - total;
@@ -632,7 +635,7 @@ function checkout() {
         }
     }
 
-    message += "\n¡Gracias por comprar en Dulce Explosión! 🍭";
+    message += "\n¡Gracias por comprar en Dulce Explosión! ✅🍭";
 
     const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
     window.open(whatsappURL, "_blank");
@@ -1139,6 +1142,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("checkoutBtnModal")) document.getElementById("checkoutBtnModal").addEventListener("click", checkout);
     if (document.getElementById("clearCartBtn")) document.getElementById("clearCartBtn").addEventListener("click", clearCart);
     if (document.getElementById("clearCartBtnModal")) document.getElementById("clearCartBtnModal").addEventListener("click", clearCart);
+
+    // Ordenamiento
+    const sortProducts = document.getElementById("sortProducts");
+    if (sortProducts) sortProducts.addEventListener("change", renderProducts);
+    const sortPromos = document.getElementById("sortPromos");
+    if (sortPromos) sortPromos.addEventListener("change", renderCombos);
 
     if (document.getElementById("adminFloatBtn")) document.getElementById("adminFloatBtn").addEventListener("click", showAdminPanel);
     if (document.getElementById("closedAdminBtn")) document.getElementById("closedAdminBtn").addEventListener("click", showAdminPanel);
