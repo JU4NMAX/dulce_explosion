@@ -122,34 +122,24 @@ html, body {
 
 .logo-title {
     font-size: 1.6rem;
-    background: linear-gradient(135deg, var(--primary-pink), var(--primary-mint));
+    font-weight: 800;
+    margin-bottom: 4px;
+    background: linear-gradient(90deg, #e8689a, #5ec9bb, #a87dd4, #e8689a, #5ec9bb);
+    background-size: 300% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: 4px;
-    font-weight: 700;
-    animation: pulse-title-animated 3s ease-in-out infinite;
+    animation: title-color-flow 3s linear infinite;
+    letter-spacing: 0.5px;
+    display: inline-block;
 }
 
-@keyframes pulse-title-animated {
-    0% {
-        transform: scale(1);
-        background: linear-gradient(135deg, var(--primary-pink), var(--primary-mint));
-        -webkit-background-clip: text;
-        background-clip: text;
-    }
-    50% {
-        transform: scale(1.03);
-        background: linear-gradient(135deg, var(--primary-mint), var(--primary-pink));
-        -webkit-background-clip: text;
-        background-clip: text;
-    }
-    100% {
-        transform: scale(1);
-        background: linear-gradient(135deg, var(--primary-pink), var(--primary-mint));
-        -webkit-background-clip: text;
-        background-clip: text;
-    }
+@keyframes title-color-flow {
+    0% { background-position: 0% center; letter-spacing: 0.5px; }
+    25% { letter-spacing: 3px; }
+    50% { background-position: 100% center; letter-spacing: 0.5px; }
+    75% { letter-spacing: 3px; }
+    100% { background-position: 200% center; letter-spacing: 0.5px; }
 }
 
 .logo-tagline {
