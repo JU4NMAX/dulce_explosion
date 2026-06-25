@@ -309,6 +309,37 @@ html, body {
    FILTROS DE CATEGORÍAS
    ================================================ */
 
+.filters-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.filters-row .category-filters {
+    margin-bottom: 0;
+    flex: 1;
+}
+
+.sort-select {
+    padding: 7px 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--dark-text);
+    background: white;
+    cursor: pointer;
+    outline: none;
+    flex-shrink: 0;
+    transition: border-color 0.2s;
+}
+
+.sort-select:focus {
+    border-color: var(--primary-pink);
+}
+
 .category-filters {
     display: flex;
     gap: 10px;
@@ -468,12 +499,14 @@ html, body {
 
 .product-price {
     font-size: 1.3rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--primary-pink), var(--primary-mint));
+    font-weight: 800;
+    background: linear-gradient(90deg, #e8689a, #5ec9bb, #a87dd4);
+    background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     margin-bottom: 10px;
+    animation: title-color-flow 3s linear infinite;
 }
 
 .product-actions {
