@@ -203,36 +203,31 @@ html, body {
 
 .cart-button {
     position: relative;
-    background: linear-gradient(90deg, var(--primary-pink), var(--primary-mint), var(--primary-pink));
-    background-size: 200% 200%;
+    background: linear-gradient(90deg, #f06fa3, #6dd5c9, #b87de8, #f06fa3);
+    background-size: 300% 300%;
     color: white;
     border: none;
     padding: 10px 16px;
     border-radius: 20px;
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: var(--shadow-medium);
+    box-shadow: 0 4px 18px rgba(240, 111, 163, 0.5);
     white-space: nowrap;
-    animation: gradient-shift 3s ease infinite;
+    animation: gradient-shift 2s ease infinite;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 
 @keyframes gradient-shift {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 .cart-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 102, 255, 0.3);
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 8px 24px rgba(240, 111, 163, 0.6);
 }
 
 .cart-button:active {
@@ -291,12 +286,14 @@ html, body {
 }
 
 .tab-button.active {
-    background: linear-gradient(90deg, var(--primary-pink), var(--primary-mint), var(--primary-pink));
-    background-size: 200% 200%;
+    background: linear-gradient(90deg, #f06fa3, #6dd5c9, #b87de8, #f06fa3);
+    background-size: 300% 300%;
     color: white;
     border-color: transparent;
-    box-shadow: var(--shadow-medium);
-    animation: gradient-shift 3s ease infinite;
+    box-shadow: 0 4px 16px rgba(240, 111, 163, 0.45);
+    animation: gradient-shift 2s ease infinite;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    font-weight: 700;
 }
 
 /* ================================================
@@ -350,11 +347,13 @@ html, body {
 }
 
 .category-filter.active {
-    background: linear-gradient(90deg, var(--primary-pink), var(--primary-mint), var(--primary-pink));
-    background-size: 200% 200%;
+    background: linear-gradient(90deg, #f06fa3, #6dd5c9, #b87de8, #f06fa3);
+    background-size: 300% 300%;
     color: white;
     border-color: transparent;
-    animation: gradient-shift 3s ease infinite;
+    box-shadow: 0 3px 12px rgba(240, 111, 163, 0.4);
+    animation: gradient-shift 2s ease infinite;
+    font-weight: 700;
 }
 
 /* ================================================
@@ -512,21 +511,23 @@ html, body {
 .add-to-cart-btn {
     flex: 1;
     padding: 8px;
-    background: linear-gradient(90deg, var(--primary-pink), var(--primary-mint), var(--primary-pink));
-    background-size: 200% 200%;
+    background: linear-gradient(90deg, #f06fa3, #6dd5c9, #b87de8, #f06fa3);
+    background-size: 300% 300%;
     color: white;
     border: none;
     border-radius: 6px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 0.8rem;
-    animation: gradient-shift 3s ease infinite;
+    font-size: 0.85rem;
+    animation: gradient-shift 2s ease infinite;
+    box-shadow: 0 3px 10px rgba(240, 111, 163, 0.4);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .add-to-cart-btn:hover {
-    transform: scale(1.05);
-    box-shadow: var(--shadow-medium);
+    transform: scale(1.06);
+    box-shadow: 0 5px 16px rgba(240, 111, 163, 0.55);
 }
 
 .add-to-cart-btn:active {
@@ -878,16 +879,19 @@ html, body {
 }
 
 .checkout-btn {
-    background: linear-gradient(90deg, var(--primary-pink), var(--primary-mint), var(--primary-pink));
-    background-size: 200% 200%;
+    background: linear-gradient(90deg, #f06fa3, #6dd5c9, #b87de8, #f06fa3);
+    background-size: 300% 300%;
     color: white;
-    box-shadow: var(--shadow-medium);
-    animation: gradient-shift 3s ease infinite;
+    box-shadow: 0 5px 20px rgba(240, 111, 163, 0.5);
+    animation: gradient-shift 2s ease infinite;
+    font-weight: 700;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    font-size: 1rem;
 }
 
 .checkout-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 102, 255, 0.3);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 28px rgba(240, 111, 163, 0.6);
 }
 
 .checkout-btn:active {
@@ -1165,8 +1169,9 @@ html, body {
     background: white;
     border-radius: 12px;
     box-shadow: var(--shadow-dark);
-    max-width: 600px;
-    max-height: 80vh;
+    width: 90vw;
+    max-width: 860px;
+    max-height: 88vh;
     overflow-y: auto;
     animation: scale-in 0.3s ease;
 }
@@ -1280,15 +1285,18 @@ html, body {
 }
 
 .admin-btn-primary {
-    background: linear-gradient(90deg, var(--primary-pink), var(--primary-mint), var(--primary-pink));
-    background-size: 200% 200%;
+    background: linear-gradient(90deg, #f06fa3, #6dd5c9, #b87de8, #f06fa3);
+    background-size: 300% 300%;
     color: white;
-    box-shadow: var(--shadow-medium);
-    animation: gradient-shift 3s ease infinite;
+    box-shadow: 0 4px 16px rgba(240, 111, 163, 0.45);
+    animation: gradient-shift 2s ease infinite;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .admin-btn-primary:hover {
     transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(240, 111, 163, 0.55);
 }
 
 .admin-btn-secondary {
@@ -1515,7 +1523,8 @@ html, body {
     }
 
     .admin-modal {
-        max-width: 90%;
+        width: 94vw;
+        max-width: 94vw;
         max-height: 90vh;
     }
 
