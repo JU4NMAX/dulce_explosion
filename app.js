@@ -1,5 +1,5 @@
 // ===============================================
-// DULCE EXPLOSIÓN v5 - IMÁGENES, LOGO Y COMBOS
+// DULCE EXPLOSIÓN v5 - IMÁGENES, LOGO Y COMBOSs
 // ===============================================
 
 // CONFIGURACIÓN DE WHATSAPP
