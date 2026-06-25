@@ -5,22 +5,22 @@
 }
 
 :root {
-    --primary-pink: #F3A0C3;
-    --primary-mint: #A2E3D4;
-    --primary-lavender: #C5A3E6;
-    --background-cream: #FAFAFA;
-    --text-caramel: #D2B48C;
-    --dark-text: #1a1a2e;
+    --primary-pink: #F7BDD6;
+    --primary-mint: #B8EDE3;
+    --primary-lavender: #D5BFEF;
+    --background-cream: #FFF8FB;
+    --text-caramel: #8B6F5C;
+    --dark-text: #2d2d3a;
     --light-text: #ffffff;
-    --border-color: #e0e0e0;
-    --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.08);
-    --shadow-medium: 0 4px 16px rgba(243, 160, 195, 0.2);
-    --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --border-color: #ecd8e8;
+    --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --shadow-medium: 0 4px 16px rgba(243, 160, 195, 0.18);
+    --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.10);
 }
 
 html, body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #FAFAFA;
+    background: var(--background-cream);
     color: var(--dark-text);
     line-height: 1.6;
     min-height: 100vh;
@@ -432,10 +432,11 @@ html, body {
 }
 
 .combo-includes {
-    font-size: 0.78rem;
-    color: var(--text-caramel);
+    font-size: 0.82rem;
+    color: #7a5c6e;
     margin-bottom: 8px;
     font-style: italic;
+    font-weight: 600;
 }
 
 .field-hint {
@@ -1231,6 +1232,15 @@ html, body {
 .admin-content.active {
     display: block;
     animation: fade-in 0.3s ease;
+}
+
+.admin-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary-pink);
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 12px;
 }
 
 .admin-form {
