@@ -501,12 +501,10 @@ html, body {
     font-size: 1.3rem;
     font-weight: 800;
     background: linear-gradient(90deg, #e8689a, #5ec9bb, #a87dd4);
-    background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     margin-bottom: 10px;
-    animation: title-color-flow 3s linear infinite;
 }
 
 .product-actions {
@@ -919,6 +917,15 @@ html, body {
 
 .checkout-btn:active {
     transform: scale(0.98);
+}
+
+.checkout-btn:disabled {
+    background: #d0d0d0;
+    color: #999;
+    box-shadow: none;
+    animation: none;
+    cursor: not-allowed;
+    transform: none !important;
 }
 
 .clear-cart-btn {
