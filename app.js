@@ -735,11 +735,18 @@ function renderAdminCombos() {
                     </div>
                 </div>
                 <div class="stock-controls">
+                    <button class="edit-btn" data-combo-id="${combo.id}">Editar</button>
                     <button class="delete-btn" data-combo-id="${combo.id}">Eliminar</button>
                 </div>
             </div>
         `;
     }).join("");
+
+    document.querySelectorAll("#combosAdminList .edit-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            openEditComboModal(btn.dataset.comboId);
+        });
+    });
 
     document.querySelectorAll("#combosAdminList .delete-btn").forEach(btn => {
         btn.addEventListener("click", () => {
@@ -754,6 +761,11 @@ function modifyStock(productId, amount) {
     const product = state.products.find(p => p.id === productId);
     if (product) {
         const newStock = Math.max(0, product.stock + amount);
+        // Actualizar localmente de inmediato para que se vea en admin al instante
+        product.stock = newStock;
+        const display = document.getElementById(`stock-${productId}`);
+        if (display) display.textContent = newStock;
+        // Luego sincronizar con Firebase
         db.ref(`products/${productId}/stock`).set(newStock);
     }
 }
@@ -800,11 +812,6 @@ function addCombo() {
 
     if (!name || !productId1 || !productId2 || isNaN(price)) {
         alert("Completa todos los campos correctamente");
-        return;
-    }
-
-    if (productId1 === productId2) {
-        alert("Selecciona dos productos diferentes");
         return;
     }
 
@@ -1008,6 +1015,56 @@ function saveEditProduct() {
     });
 }
 
+function openEditComboModal(comboId) {
+    const combo = state.combos.find(c => c.id === comboId);
+    if (!combo) return;
+
+    document.getElementById("editComboId").value = comboId;
+    document.getElementById("editComboName").value = combo.name;
+    document.getElementById("editComboPrice").value = combo.price;
+    document.getElementById("editComboImage").value = combo.image || "";
+
+    const options = '<option value="">Selecciona producto</option>' +
+        state.products.map(p => `<option value="${p.id}">${p.name}</option>`).join("");
+    document.getElementById("editComboProduct1").innerHTML = options;
+    document.getElementById("editComboProduct2").innerHTML = options;
+    document.getElementById("editComboProduct1").value = combo.productId1;
+    document.getElementById("editComboProduct2").value = combo.productId2;
+
+    document.getElementById("editComboModal").classList.add("active");
+}
+
+function closeEditComboModal() {
+    document.getElementById("editComboModal").classList.remove("active");
+}
+
+function saveEditCombo() {
+    const comboId = document.getElementById("editComboId").value;
+    const name = document.getElementById("editComboName").value.trim();
+    const productId1 = document.getElementById("editComboProduct1").value;
+    const productId2 = document.getElementById("editComboProduct2").value;
+    const price = parseFloat(document.getElementById("editComboPrice").value);
+    const image = document.getElementById("editComboImage").value.trim();
+
+    if (!name || !productId1 || !productId2 || isNaN(price)) {
+        alert("Completa todos los campos correctamente");
+        return;
+    }
+
+    db.ref(`combos/${comboId}`).update({
+        name,
+        productId1,
+        productId2,
+        price,
+        image: toRawUrl(image)
+    }).then(() => {
+        alert("Promoción actualizada correctamente");
+        closeEditComboModal();
+    }).catch(() => {
+        alert("Error al guardar los cambios");
+    });
+}
+
 // ===============================================
 // INICIALIZACIÓN
 // ===============================================
@@ -1089,6 +1146,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (document.getElementById("saveEditProductBtn")) document.getElementById("saveEditProductBtn").addEventListener("click", saveEditProduct);
     if (document.getElementById("cancelEditProductBtn")) document.getElementById("cancelEditProductBtn").addEventListener("click", closeEditProductModal);
+    if (document.getElementById("saveEditComboBtn")) document.getElementById("saveEditComboBtn").addEventListener("click", saveEditCombo);
+    if (document.getElementById("cancelEditComboBtn")) document.getElementById("cancelEditComboBtn").addEventListener("click", closeEditComboModal);
 
     if (document.getElementById("saveTimesBtn")) document.getElementById("saveTimesBtn").addEventListener("click", saveTimes);
     if (document.getElementById("changePasswordBtn")) document.getElementById("changePasswordBtn").addEventListener("click", changePassword);
