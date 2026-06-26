@@ -465,6 +465,65 @@ html, body {
     margin-top: 4px;
 }
 
+.add-product-row-btn {
+    background: none;
+    border: 2px dashed var(--primary-lavender);
+    color: var(--primary-lavender);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 4px;
+    transition: all 0.2s;
+}
+
+.add-product-row-btn:hover {
+    background: #f3eeff;
+    border-color: #a87dd4;
+    color: #a87dd4;
+}
+
+.combo-product-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.combo-product-row label {
+    min-width: 80px;
+    flex-shrink: 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+}
+
+.combo-product-row select {
+    flex: 1;
+}
+
+.remove-product-row-btn {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.remove-product-row-btn:hover {
+    background: #ff5252;
+}
+
 .product-info {
     padding: 12px;
     flex-grow: 1;
@@ -571,6 +630,91 @@ html, body {
     font-weight: 700;
     font-size: 0.65rem;
     box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+    z-index: 2;
+}
+
+/* --- Etiquetas de novedad --- */
+.item-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    padding: 4px 10px;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 0.65rem;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.badge-new {
+    background: linear-gradient(135deg, #a78bfa, #7c3aed);
+    color: white;
+    box-shadow: 0 0 0 0 rgba(167,139,250,0.7);
+    animation: badge-pulse 2s ease-in-out infinite;
+}
+
+.badge-trending {
+    background: linear-gradient(135deg, #f97316, #ef4444);
+    color: white;
+}
+
+.badge-price-down {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+}
+
+.badge-price-up {
+    background: linear-gradient(135deg, #f87171, #dc2626);
+    color: white;
+}
+
+.badge-limited {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #1a1a1a;
+    animation: badge-flash 1s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(167,139,250,0.7); }
+    50% { box-shadow: 0 0 0 6px rgba(167,139,250,0); }
+}
+
+@keyframes badge-flash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Borde brillante para items con etiqueta "Nuevo" */
+.product-card.has-badge-new {
+    border: 2px solid #a78bfa;
+    box-shadow: 0 0 12px rgba(167,139,250,0.3);
+}
+
+/* --- Lista de etiquetas activas en admin --- */
+.label-admin-item {
+    background: #f9f9f9;
+    padding: 10px 14px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 3px solid var(--primary-lavender);
+    margin-bottom: 8px;
+}
+
+.label-admin-info {
+    flex: 1;
+}
+
+.label-admin-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.label-admin-meta {
+    font-size: 0.78rem;
+    color: #888;
+    margin-top: 2px;
 }
 
 /* ================================================
@@ -1514,7 +1658,7 @@ html, body {
 }
 
 /* ================================================
-   RESPONSIVE s
+   RESPONSIVE
    ================================================ */
 
 @media (max-width: 768px) {
