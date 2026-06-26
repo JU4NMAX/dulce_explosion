@@ -100,6 +100,8 @@
                             <option value="za">Z → A</option>
                             <option value="stock-desc">Mayor cantidad</option>
                             <option value="stock-asc">Menor cantidad</option>
+                            <option value="price-desc">Mayor precio</option>
+                            <option value="price-asc">Menor precio</option>
                         </select>
                     </div>
                     <div class="products-grid" id="productsGrid">
@@ -117,6 +119,8 @@
                         <select class="sort-select" id="sortPromos">
                             <option value="az">A → Z</option>
                             <option value="za">Z → A</option>
+                            <option value="price-desc">Mayor precio</option>
+                            <option value="price-asc">Menor precio</option>
                         </select>
                     </div>
                     <div class="promotions-grid" id="promotionsGrid">
@@ -223,8 +227,11 @@
                 <button class="admin-tab" data-admin-tab="agregar">
                     ➕ Agregar
                 </button>
+                <button class="admin-tab" data-admin-tab="etiquetas">
+                    🏷️ Etiquetas
+                </button>
                 <button class="admin-tab" data-admin-tab="categorias">
-                    🏷️ Categorías
+                    📂 Categorías
                 </button>
                 <button class="admin-tab" data-admin-tab="config">
                     ⚙️ Config
@@ -279,19 +286,22 @@
                         <label>Nombre de la Promoción</label>
                         <input type="text" id="comboName" placeholder="Ej: 2 Nucitas por menos" required>
                     </div>
-                    <div class="form-group">
-                        <label>Producto 1</label>
-                        <select id="comboProduct1" required>
-                            <option value="">Selecciona producto</option>
-                        </select>
+                    <div id="comboProductsContainer">
+                        <div class="form-group combo-product-row">
+                            <label>Producto 1</label>
+                            <select class="combo-product-select" required>
+                                <option value="">Selecciona producto</option>
+                            </select>
+                        </div>
+                        <div class="form-group combo-product-row">
+                            <label>Producto 2</label>
+                            <select class="combo-product-select" required>
+                                <option value="">Selecciona producto</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Producto 2 (puede ser el mismo)</label>
-                        <select id="comboProduct2" required>
-                            <option value="">Selecciona producto</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
+                    <button type="button" class="add-product-row-btn" id="addComboProductBtn">+ Agregar producto al combo</button>
+                    <div class="form-group" style="margin-top:12px;">
                         <label>Precio Especial ($)</label>
                         <input type="number" id="comboPrice" min="0" step="0.01" required>
                     </div>
@@ -301,6 +311,47 @@
                     </div>
                     <button type="submit" class="admin-btn-primary">Crear Promoción</button>
                 </form>
+            </div>
+
+            <!-- TAB: ETIQUETAS -->
+            <div class="admin-content" data-admin-content="etiquetas">
+                <h3 class="admin-section-title">Asignar Etiqueta</h3>
+                <div class="admin-form">
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <select id="labelItemType">
+                            <option value="product">Producto</option>
+                            <option value="combo">Promoción</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Producto / Promoción</label>
+                        <select id="labelItemId">
+                            <option value="">Selecciona...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Etiqueta</label>
+                        <select id="labelType">
+                            <option value="">Sin etiqueta</option>
+                            <option value="new">🆕 Nuevo</option>
+                            <option value="trending">🔥 Trending</option>
+                            <option value="price-down">📉 Bajó de precio</option>
+                            <option value="price-up">📈 Subió de precio</option>
+                            <option value="limited">⚡ Oferta limitada</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="labelDateGroup" style="display:none;">
+                        <label>Fecha límite (la oferta se retira ese día)</label>
+                        <input type="date" id="labelExpiry">
+                    </div>
+                    <button class="admin-btn-primary" id="saveLabelBtn">Guardar Etiqueta</button>
+                </div>
+
+                <h3 class="admin-section-title" style="margin-top:20px;">Etiquetas Activas</h3>
+                <div id="activeLabels" class="products-admin-list">
+                    <p class="loading-text">Sin etiquetas activas</p>
+                </div>
             </div>
 
             <!-- TAB: CATEGORÍAS -->
@@ -404,19 +455,11 @@
                 <label>Nombre</label>
                 <input type="text" id="editComboName" required>
             </div>
-            <div class="form-group">
-                <label>Producto 1</label>
-                <select id="editComboProduct1">
-                    <option value="">Selecciona producto</option>
-                </select>
+            <div id="editComboProductsContainer">
+                <!-- Se llena dinámicamente -->
             </div>
-            <div class="form-group">
-                <label>Producto 2 (puede ser el mismo)</label>
-                <select id="editComboProduct2">
-                    <option value="">Selecciona producto</option>
-                </select>
-            </div>
-            <div class="form-group">
+            <button type="button" class="add-product-row-btn" id="addEditComboProductBtn">+ Agregar producto</button>
+            <div class="form-group" style="margin-top:12px;">
                 <label>Precio Especial ($)</label>
                 <input type="number" id="editComboPrice" min="0" step="0.01" required>
             </div>
