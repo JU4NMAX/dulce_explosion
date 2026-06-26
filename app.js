@@ -793,6 +793,8 @@ function renderAdminPanel() {
     loadAdminSettings();
     populateLabelItemSelect();
     renderActiveLabels();
+    // Re-inicializar el contenedor dinámico de productos al abrir el admin
+    initComboContainer("comboProductsContainer");
 }
 
 function renderAdminProducts() {
@@ -862,17 +864,18 @@ function renderAdminCombos() {
 
     const sortedCombos = [...state.combos].sort((a, b) => a.name.localeCompare(b.name));
     list.innerHTML = sortedCombos.map(combo => {
-        const product1 = state.products.find(p => p.id === combo.productId1);
-        const product2 = state.products.find(p => p.id === combo.productId2);
+        const ids = getComboProductIds(combo);
+        const names = ids.map(id => {
+            const p = state.products.find(p => p.id === id);
+            return p ? p.name : "Eliminado";
+        }).join(" + ");
         return `
             <div class="product-admin-item">
                 <img src="${getImageOrPlaceholder(combo.image)}" alt="${combo.name}" class="product-admin-thumb">
                 <div class="product-admin-info">
                     <div class="product-admin-name">${combo.name}</div>
                     <div class="product-admin-price">${formatPrice(combo.price)}</div>
-                    <div class="product-admin-stock">
-                        ${product1 ? product1.name : "Eliminado"} + ${product2 ? product2.name : "Eliminado"}
-                    </div>
+                    <div class="product-admin-stock">${names}</div>
                 </div>
                 <div class="stock-controls">
                     <button class="edit-btn" data-combo-id="${combo.id}">Editar</button>
@@ -1450,6 +1453,22 @@ document.addEventListener("DOMContentLoaded", () => {
     if (labelType) labelType.addEventListener("change", toggleExpiryField);
     const saveLabelBtn = document.getElementById("saveLabelBtn");
     if (saveLabelBtn) saveLabelBtn.addEventListener("click", saveLabel);
+
+    // Botones + para agregar productos a combos
+    const addComboProductBtn = document.getElementById("addComboProductBtn");
+    if (addComboProductBtn) addComboProductBtn.addEventListener("click", () => {
+        const rows = document.querySelectorAll("#comboProductsContainer .combo-product-row");
+        if (rows.length < 6) addProductRowTo("comboProductsContainer", "", true);
+    });
+
+    const addEditComboProductBtn = document.getElementById("addEditComboProductBtn");
+    if (addEditComboProductBtn) addEditComboProductBtn.addEventListener("click", () => {
+        const rows = document.querySelectorAll("#editComboProductsContainer .combo-product-row");
+        if (rows.length < 6) addProductRowTo("editComboProductsContainer", "", true);
+    });
+
+    // Inicializar contenedor de productos del formulario de agregar combo
+    initComboContainer("comboProductsContainer");
 
     if (document.getElementById("saveEditProductBtn")) document.getElementById("saveEditProductBtn").addEventListener("click", saveEditProduct);
     if (document.getElementById("cancelEditProductBtn")) document.getElementById("cancelEditProductBtn").addEventListener("click", closeEditProductModal);
