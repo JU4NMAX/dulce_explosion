@@ -1,9 +1,10 @@
+
 // ===============================================
 // DULCE EXPLOSIÓN v3 - IMÁGENES, LOGO Y COMBOS
 // ===============================================
 
 // CONFIGURACIÓN DE WHATSAPP
-const WHATSAPP_NUMBER = "573222005193";
+const WHATSAPP_NUMBER = "573147194698";
 
 // ===============================================
 // INICIALIZACIÓN DE FIREBASE
