@@ -647,10 +647,12 @@ html, body {
 }
 
 .badge-new {
-    background: linear-gradient(135deg, #a78bfa, #7c3aed);
+    background: linear-gradient(135deg, #7c3aed, #4c1d95);
     color: white;
-    box-shadow: 0 0 0 0 rgba(167,139,250,0.7);
-    animation: badge-pulse 2s ease-in-out infinite;
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.8), 0 2px 8px rgba(76, 29, 149, 0.5);
+    animation: badge-pulse 1.8s ease-in-out infinite;
+    font-size: 0.7rem;
+    letter-spacing: 0.3px;
 }
 
 .badge-trending {
@@ -675,8 +677,8 @@ html, body {
 }
 
 @keyframes badge-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(167,139,250,0.7); }
-    50% { box-shadow: 0 0 0 6px rgba(167,139,250,0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.8), 0 2px 8px rgba(76, 29, 149, 0.5); }
+    50% { box-shadow: 0 0 0 7px rgba(124, 58, 237, 0), 0 2px 8px rgba(76, 29, 149, 0.5); }
 }
 
 @keyframes badge-flash {
@@ -686,8 +688,8 @@ html, body {
 
 /* Borde brillante para items con etiqueta "Nuevo" */
 .product-card.has-badge-new {
-    border: 2px solid #a78bfa;
-    box-shadow: 0 0 12px rgba(167,139,250,0.3);
+    border: 2px solid #7c3aed;
+    box-shadow: 0 0 16px rgba(124, 58, 237, 0.35);
 }
 
 /* --- Lista de etiquetas activas en admin --- */
